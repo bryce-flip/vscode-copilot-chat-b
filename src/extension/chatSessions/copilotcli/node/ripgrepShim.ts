@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { promises as fs } from 'fs';
+import { existsSync, promises as fs } from 'fs';
 import * as path from 'path';
 import { ILogService } from '../../../../platform/log/common/logService';
 
@@ -40,9 +40,41 @@ export async function ensureRipgrepShim(extensionPath: string, vscodeAppRoot: st
 }
 
 async function _ensureRipgrepShim(extensionPath: string, vscodeAppRoot: string, logService: ILogService): Promise<void> {
-	const vscodeRipgrepPath = path.join(vscodeAppRoot, 'node_modules', '@vscode', 'ripgrep', 'bin');
+	const vscodeRipgrepPath = await resolveVscodeRipgrepBinDir(vscodeAppRoot);
+	if (!vscodeRipgrepPath) {
+		const tried = getVscodeRipgrepBinCandidates(vscodeAppRoot).join(', ');
+		throw new Error(`Could not locate VS Code ripgrep binary. Tried: ${tried}`);
+	}
 
 	await copyRipgrepShim(extensionPath, vscodeRipgrepPath, logService);
+}
+
+/**
+ * VS Code ≥ 1.122 ships `@vscode/ripgrep-universal` with per-platform bins.
+ * Older builds used a flat `@vscode/ripgrep/bin` layout.
+ */
+export function getVscodeRipgrepBinCandidates(vscodeAppRoot: string): string[] {
+	const platformArch = `${process.platform}-${process.arch}`;
+	return [
+		path.join(vscodeAppRoot, 'node_modules', '@vscode', 'ripgrep-universal', 'bin', platformArch),
+		path.join(vscodeAppRoot, 'node_modules.asar.unpacked', '@vscode', 'ripgrep-universal', 'bin', platformArch),
+		path.join(vscodeAppRoot, 'node_modules', '@vscode', 'ripgrep', 'bin'),
+		path.join(vscodeAppRoot, 'node_modules.asar.unpacked', '@vscode', 'ripgrep', 'bin'),
+	];
+}
+
+export function resolveVscodeRipgrepBinDirSync(vscodeAppRoot: string): string | undefined {
+	const binaryName = process.platform === 'win32' ? 'rg.exe' : 'rg';
+	for (const dir of getVscodeRipgrepBinCandidates(vscodeAppRoot)) {
+		if (existsSync(path.join(dir, binaryName))) {
+			return dir;
+		}
+	}
+	return undefined;
+}
+
+export async function resolveVscodeRipgrepBinDir(vscodeAppRoot: string): Promise<string | undefined> {
+	return resolveVscodeRipgrepBinDirSync(vscodeAppRoot);
 }
 
 export async function copyRipgrepShim(extensionPath: string, vscodeRipgrepPath: string, logService: ILogService): Promise<void> {
@@ -63,7 +95,8 @@ export async function copyRipgrepShim(extensionPath: string, vscodeRipgrepPath: 
 }
 
 async function copyRipgrepWithRetries(sourceDir: string, destDir: string, entries: string[], logService: ILogService): Promise<void> {
-	const primaryBinary = entries.find(entry => entry.endsWith('.node'));
+	const binaryName = process.platform === 'win32' ? 'rg.exe' : 'rg';
+	const primaryBinary = entries.find(entry => entry === binaryName) ?? entries.find(entry => entry.startsWith('rg'));
 	for (let attempt = 1; attempt <= MAX_COPY_ATTEMPTS; attempt++) {
 		try {
 			await fs.cp(sourceDir, destDir, {

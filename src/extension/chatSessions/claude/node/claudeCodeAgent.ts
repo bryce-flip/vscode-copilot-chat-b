@@ -6,6 +6,7 @@
 import { HookCallbackMatcher, HookEvent, HookInput, HookJSONOutput, McpServerConfig, Options, PermissionMode, PreToolUseHookInput, Query, SDKUserMessage } from '@anthropic-ai/claude-agent-sdk';
 import Anthropic from '@anthropic-ai/sdk';
 import * as l10n from '@vscode/l10n';
+import * as path from 'path';
 import type * as vscode from 'vscode';
 import { IChatDebugFileLoggerService } from '../../../../platform/chat/common/chatDebugFileLoggerService';
 import { INativeEnvService } from '../../../../platform/env/common/envService';
@@ -29,6 +30,7 @@ import { IClaudeRuntimeDataService } from '../common/claudeRuntimeDataService';
 import { ClaudeSessionUri } from '../common/claudeSessionUri';
 import { IClaudeToolPermissionService } from '../common/claudeToolPermissionService';
 import { claudeEditTools, getAffectedUrisForEditTool } from '../common/claudeTools';
+import { resolveVscodeRipgrepBinDirSync } from '../../copilotcli/node/ripgrepShim';
 import { IClaudeCodeSdkService } from './claudeCodeSdkService';
 import { ClaudeLanguageModelServer, IClaudeLanguageModelServerConfig } from './claudeLanguageModelServer';
 import { resolvePromptToContentBlocks } from './claudePromptResolver';
@@ -448,7 +450,7 @@ export class ClaudeCodeSession extends Disposable {
 					ANTHROPIC_AUTH_TOKEN: `${this.serverConfig.nonce}.${this.sessionId}`,
 					CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: '1',
 					USE_BUILTIN_RIPGREP: '0',
-					PATH: `${this.envService.appRoot}/node_modules/@vscode/ripgrep/bin${pathSep}${process.env.PATH}`
+					PATH: `${resolveVscodeRipgrepBinDirSync(this.envService.appRoot) ?? path.join(this.envService.appRoot, 'node_modules', '@vscode', 'ripgrep', 'bin')}${pathSep}${process.env.PATH}`
 				},
 				attribution: {
 					commit: '',

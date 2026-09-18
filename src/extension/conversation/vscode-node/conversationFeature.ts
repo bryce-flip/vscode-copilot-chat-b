@@ -38,7 +38,6 @@ import { NotebookCellLinkifier } from '../../linkify/vscode-node/notebookCellLin
 import { SymbolLinkifier } from '../../linkify/vscode-node/symbolLinkifier';
 import { IntentDetector } from '../../prompt/node/intentDetector';
 import { SemanticSearchTextSearchProvider } from '../../workspaceSemanticSearch/node/semanticSearchTextSearchProvider';
-import { GitHubPullRequestProviders } from '../node/githubPullRequestProviders';
 import { startFeedbackCollection } from './feedbackCollection';
 import { registerNewWorkspaceIntentCommand } from './newWorkspaceFollowup';
 import { generateTerminalFixes, setLastCommandMatchResult } from './terminalFixGenerator';
@@ -170,9 +169,9 @@ export class ConversationFeature implements IExtensionContribution {
 		} else {
 			this._searchProviderRegistered = true;
 
-			// Don't register for no auth user
-			if (this.authenticationService.copilotToken?.isNoAuthUser) {
-				this.logService.debug('ConversationFeature: Skipping search provider registration - no GitHub session available');
+			// Semantic search requires remote embeddings, which are unavailable in the local-only build.
+			if (this.authenticationService.copilotToken?.isNoAuthUser || this.authenticationService.copilotToken?.isLocalOpenAIModelUser) {
+				this.logService.debug('ConversationFeature: Skipping remote search provider registration');
 				return;
 			}
 
@@ -298,7 +297,6 @@ export class ConversationFeature implements IExtensionContribution {
 			this.instantiationService.invokeFunction(registerInlineChatCommands),
 			this.registerTerminalQuickFixProviders(),
 			registerNewWorkspaceIntentCommand(this.newWorkspacePreviewContentManager, this.logService, options),
-			registerGitHubPullRequestTitleAndDescriptionProvider(this.instantiationService),
 			registerSearchIntentCommand(),
 		].forEach(d => disposables.add(d));
 		return disposables;
@@ -389,8 +387,4 @@ function registerSearchIntentCommand(): IDisposable {
 		);
 		vscode.commands.executeCommand('workbench.action.findInFiles', arg);
 	});
-}
-
-function registerGitHubPullRequestTitleAndDescriptionProvider(instantiationService: IInstantiationService): IDisposable {
-	return instantiationService.createInstance(GitHubPullRequestProviders);
 }

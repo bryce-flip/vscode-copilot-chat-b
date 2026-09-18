@@ -9,13 +9,25 @@ import { DisposableStore } from '../../../../util/vs/base/common/lifecycle';
 import { ConfigKey, IConfigurationService } from '../../../configuration/common/configurationService';
 import { InMemoryConfigurationService } from '../../../configuration/test/common/inMemoryConfigurationService';
 import { createPlatformServices } from '../../../test/node/services';
-import { createLocalOpenAIChatModelInformation, getLocalOpenAIModelSettings, isLocalOpenAIModelConfigured, resolveLocalOpenAIChatCompletionsUrl } from '../../common/localOpenAIModel';
+import { createLocalOpenAIChatModelInformation, expandEnvPlaceholders, getLocalOpenAIModelSettings, isLocalOpenAIModelConfigured, resolveLocalOpenAIApiKey, resolveLocalOpenAIChatCompletionsUrl } from '../../common/localOpenAIModel';
 
 describe('local OpenAI model settings', () => {
 	const disposables = new DisposableStore();
+	const originalXaiApiKey = process.env.XAI_API_KEY;
+	const originalOpenAIApiKey = process.env.OPENAI_API_KEY;
 
 	afterEach(() => {
 		disposables.clear();
+		if (originalXaiApiKey === undefined) {
+			delete process.env.XAI_API_KEY;
+		} else {
+			process.env.XAI_API_KEY = originalXaiApiKey;
+		}
+		if (originalOpenAIApiKey === undefined) {
+			delete process.env.OPENAI_API_KEY;
+		} else {
+			process.env.OPENAI_API_KEY = originalOpenAIApiKey;
+		}
 	});
 
 	function createConfigService(): InMemoryConfigurationService {
@@ -25,6 +37,8 @@ describe('local OpenAI model settings', () => {
 	}
 
 	it('is not configured until enabled with api key and base url', async () => {
+		delete process.env.XAI_API_KEY;
+		delete process.env.OPENAI_API_KEY;
 		const config = createConfigService();
 		expect(isLocalOpenAIModelConfigured(config)).toBe(false);
 
@@ -34,6 +48,21 @@ describe('local OpenAI model settings', () => {
 		await config.setConfig(ConfigKey.LocalModelApiKey, 'test-key');
 		await config.setConfig(ConfigKey.LocalModelBaseUrl, 'https://api.x.ai/v1');
 		expect(isLocalOpenAIModelConfigured(config)).toBe(true);
+	});
+
+	it('resolves api keys from ${env:...} and common environment fallbacks', () => {
+		delete process.env.XAI_API_KEY;
+		delete process.env.OPENAI_API_KEY;
+		expect(resolveLocalOpenAIApiKey('')).toBe('');
+		expect(expandEnvPlaceholders('${env:MISSING_ENV_VAR:fallback-key}')).toBe('fallback-key');
+
+		process.env.XAI_API_KEY = 'from-xai';
+		expect(resolveLocalOpenAIApiKey('')).toBe('from-xai');
+		expect(resolveLocalOpenAIApiKey('${env:XAI_API_KEY}')).toBe('from-xai');
+
+		delete process.env.XAI_API_KEY;
+		process.env.OPENAI_API_KEY = 'from-openai';
+		expect(resolveLocalOpenAIApiKey('')).toBe('from-openai');
 	});
 
 	it('uses grok defaults and resolves OpenAI-compatible urls', async () => {
@@ -46,8 +75,8 @@ describe('local OpenAI model settings', () => {
 		expect(settings).toMatchObject({
 			apiKey: 'test-key',
 			baseUrl: 'https://api.x.ai/v1',
-			model: 'grok-code-fast-1',
-			name: 'Grok Code Fast 1',
+			model: 'grok-latest',
+			name: 'Grok Latest',
 			maxInputTokens: 120000,
 			maxOutputTokens: 32000,
 			toolCalling: true,
@@ -55,7 +84,7 @@ describe('local OpenAI model settings', () => {
 		});
 
 		const modelInfo = createLocalOpenAIChatModelInformation(settings!);
-		expect(modelInfo.id).toBe('grok-code-fast-1');
+		expect(modelInfo.id).toBe('grok-latest');
 		expect(modelInfo.vendor).toBe('copilot');
 		expect(modelInfo.is_chat_default).toBe(true);
 		expect(modelInfo.capabilities.tokenizer).toBe(TokenizerType.O200K);

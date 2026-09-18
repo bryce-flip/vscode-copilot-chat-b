@@ -37,6 +37,7 @@
 			"smartStep": true,
 			"sourceMaps": true,
 			"preLaunchTask": "watch",
+			"envFile": "${workspaceFolder}/.env",
 			"env": {
 				"COPILOT_LOG_TELEMETRY": "true",
 				"VSCODE_DEV_DEBUG": "1",
@@ -65,6 +66,7 @@
 			"smartStep": true,
 			"sourceMaps": true,
 			"preLaunchTask": "watch",
+			"envFile": "${workspaceFolder}/.env",
 			"env": {
 				"COPILOT_LOG_TELEMETRY": "true",
 				"VSCODE_DEV_DEBUG": "1",
@@ -96,6 +98,7 @@
 			"smartStep": true,
 			"sourceMaps": true,
 			"preLaunchTask": "watch",
+			"envFile": "${workspaceFolder}/.env",
 			"env": {
 				"COPILOT_LOG_TELEMETRY": "true",
 				"VSCODE_DEV_DEBUG": "1",

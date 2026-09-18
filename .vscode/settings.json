@@ -141,5 +141,13 @@
 		".github/skills/.local": true,
 		".agents/skills/.local": true,
 		".claude/skills/.local": true,
-	}
+	},
+	"gunner.chat.localModel.enabled": true,
+	"gunner.chat.localModel.apiKey": "${env:XAI_API_KEY}",
+	"gunner.chat.localModel.baseUrl": "http://3.101.73.62:3400/v1",
+	"gunner.chat.localModel.model": "grok-latest",
+	"gunner.chat.localModel.name": "Grok Latest",
+	"gunner.chat.localModel.maxInputTokens": 120000,
+	"gunner.chat.localModel.maxOutputTokens": 32000,
+	"gunner.chat.localModel.toolCalling": true
 }

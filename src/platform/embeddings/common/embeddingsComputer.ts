@@ -132,6 +132,25 @@ export interface IEmbeddingsComputer {
 	): Promise<Embeddings>;
 }
 
+/**
+ * Local-only builds do not have a configured embeddings endpoint. Returning no
+ * vectors keeps optional semantic features offline instead of falling back to
+ * the Copilot embeddings service.
+ */
+export class NullEmbeddingsComputer implements IEmbeddingsComputer {
+	declare readonly _serviceBrand: undefined;
+
+	async computeEmbeddings(
+		type: EmbeddingType,
+		_inputs: readonly string[],
+		_options?: ComputeEmbeddingsOptions,
+		_telemetryInfo?: TelemetryCorrelationId,
+		_token?: CancellationToken,
+	): Promise<Embeddings> {
+		return { type, values: [] };
+	}
+}
+
 function dotProduct(a: EmbeddingVector, b: EmbeddingVector): number {
 	if (a.length !== b.length) {
 		console.warn('Embeddings do not have same length for computing dot product');

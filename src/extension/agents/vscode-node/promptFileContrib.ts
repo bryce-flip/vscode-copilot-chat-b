@@ -4,16 +4,13 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as vscode from 'vscode';
-import { ConfigKey, IConfigurationService } from '../../../platform/configuration/common/configurationService';
+import { IConfigurationService } from '../../../platform/configuration/common/configurationService';
 import { Disposable, MutableDisposable } from '../../../util/vs/base/common/lifecycle';
-import { SyncDescriptor } from '../../../util/vs/platform/instantiation/common/descriptors';
 import { IInstantiationService } from '../../../util/vs/platform/instantiation/common/instantiation';
 import { IExtensionContribution } from '../../common/contributions';
 import { AskAgentProvider } from './askAgentProvider';
 import { EditModeAgentProvider } from './editModeAgentProvider';
 import { ExploreAgentProvider } from './exploreAgentProvider';
-import { GitHubOrgCustomAgentProvider } from './githubOrgCustomAgentProvider';
-import { GitHubOrgInstructionsProvider } from './githubOrgInstructionsProvider';
 import { PlanAgentProvider } from './planAgentProvider';
 
 export class PromptFileContribution extends Disposable implements IExtensionContribution {
@@ -47,12 +44,6 @@ export class PromptFileContribution extends Disposable implements IExtensionCont
 				}
 			}));
 
-			// Only register the provider if the setting is enabled
-			if (configurationService.getConfig(ConfigKey.EnableOrganizationCustomAgents)) {
-				const githubOrgAgentProvider: vscode.ChatCustomAgentProvider = instantiationService.createInstance(new SyncDescriptor(GitHubOrgCustomAgentProvider));
-				this._register(vscode.chat.registerCustomAgentProvider(githubOrgAgentProvider));
-			}
-
 			// Register Plan agent provider for dynamic settings-based customization
 			const planProvider = instantiationService.createInstance(PlanAgentProvider);
 			this._register(vscode.chat.registerCustomAgentProvider(planProvider));
@@ -66,13 +57,5 @@ export class PromptFileContribution extends Disposable implements IExtensionCont
 			this._register(vscode.chat.registerCustomAgentProvider(exploreProvider));
 		}
 
-		// Register instructions provider
-		if ('registerInstructionsProvider' in vscode.chat) {
-			// Only register the provider if the setting is enabled
-			if (configurationService.getConfig(ConfigKey.EnableOrganizationInstructions)) {
-				const githubOrgInstructionsProvider: vscode.ChatInstructionsProvider = instantiationService.createInstance(new SyncDescriptor(GitHubOrgInstructionsProvider));
-				this._register(vscode.chat.registerInstructionsProvider(githubOrgInstructionsProvider));
-			}
-		}
 	}
 }

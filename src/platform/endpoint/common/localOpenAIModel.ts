@@ -8,7 +8,8 @@ import { TokenizerType } from '../../../util/common/tokenizer';
 import { ConfigKey, IConfigurationService } from '../../configuration/common/configurationService';
 import { IChatModelInformation, ModelSupportedEndpoint } from './endpointProvider';
 
-export const DEFAULT_LOCAL_OPENAI_MODEL_ID = 'grok-code-fast-1';
+export const DEFAULT_LOCAL_OPENAI_MODEL_ID = 'grok-latest';
+export const DEFAULT_LOCAL_OPENAI_API_KEY_ENV = 'XAI_API_KEY';
 
 export interface LocalOpenAIModelSettings {
 	readonly apiKey: string;
@@ -33,6 +34,8 @@ const LOCAL_MODEL_CONFIG_KEYS = [
 	ConfigKey.LocalModelVision,
 ] as const;
 
+const ENV_PLACEHOLDER_RE = /\$\{env:([A-Za-z_][A-Za-z0-9_]*)(?::([^}]*))?\}/g;
+
 export function isLocalOpenAIModelConfigured(configurationService: IConfigurationService): boolean {
 	return getLocalOpenAIModelSettings(configurationService) !== undefined;
 }
@@ -41,12 +44,36 @@ export function isLocalOpenAIModelConfigurationChange(e: ConfigurationChangeEven
 	return LOCAL_MODEL_CONFIG_KEYS.some(key => e.affectsConfiguration(key.fullyQualifiedId));
 }
 
+/**
+ * Resolve an API key from settings.
+ * Supports `${env:VAR}` / `${env:VAR:default}` placeholders and, when the setting
+ * is empty, falls back to `XAI_API_KEY` then `OPENAI_API_KEY`.
+ */
+export function resolveLocalOpenAIApiKey(configuredApiKey: string | undefined): string {
+	const expanded = expandEnvPlaceholders((configuredApiKey ?? '').trim());
+	if (expanded) {
+		return expanded;
+	}
+
+	return (process.env.XAI_API_KEY ?? process.env.OPENAI_API_KEY ?? '').trim();
+}
+
+export function expandEnvPlaceholders(value: string): string {
+	return value.replace(ENV_PLACEHOLDER_RE, (_match, name: string, fallback?: string) => {
+		const envValue = process.env[name];
+		if (envValue !== undefined && envValue !== '') {
+			return envValue;
+		}
+		return fallback ?? '';
+	});
+}
+
 export function getLocalOpenAIModelSettings(configurationService: IConfigurationService): LocalOpenAIModelSettings | undefined {
 	if (!configurationService.getConfig(ConfigKey.LocalModelEnabled)) {
 		return undefined;
 	}
 
-	const apiKey = configurationService.getConfig(ConfigKey.LocalModelApiKey).trim();
+	const apiKey = resolveLocalOpenAIApiKey(configurationService.getConfig(ConfigKey.LocalModelApiKey));
 	const baseUrl = configurationService.getConfig(ConfigKey.LocalModelBaseUrl).trim();
 	if (!apiKey || !baseUrl) {
 		return undefined;
@@ -116,14 +143,14 @@ export function createLocalOpenAIChatModelInformation(settings: LocalOpenAIModel
 }
 
 function defaultMaxInputTokens(modelId: string): number {
-	if (modelId.startsWith('grok-code') || /^grok-[4-9]/.test(modelId)) {
+	if (modelId.startsWith('grok-code') || modelId.startsWith('grok-build') || modelId.startsWith('grok-latest') || /^grok-[4-9]/.test(modelId)) {
 		return 120000;
 	}
 	return 100000;
 }
 
 function defaultMaxOutputTokens(modelId: string): number {
-	if (modelId.startsWith('grok-code') || /^grok-[4-9]/.test(modelId)) {
+	if (modelId.startsWith('grok-code') || modelId.startsWith('grok-build') || modelId.startsWith('grok-latest') || /^grok-[4-9]/.test(modelId)) {
 		return 32000;
 	}
 	return 8192;

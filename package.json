@@ -1043,35 +1043,6 @@
 				"when": "!config.gunner.chat.getSearchViewResultsSkill.enabled"
 			},
 			{
-				"name": "gunner_githubRepo",
-				"toolReferenceName": "githubRepo",
-				"legacyToolReferenceFullNames": [
-					"githubRepo"
-				],
-				"displayName": "%gunner.tools.githubRepo.name%",
-				"modelDescription": "Searches a GitHub repository for relevant source code snippets. Only use this tool if the user is very clearly asking for code snippets from a specific GitHub repository. Do not use this tool for Github repos that the user has open in their workspace.",
-				"userDescription": "%gunner.tools.githubRepo.userDescription%",
-				"icon": "$(repo)",
-				"when": "!config.gunner.chat.githubMcpServer.enabled",
-				"inputSchema": {
-					"type": "object",
-					"properties": {
-						"repo": {
-							"type": "string",
-							"description": "The name of the Github repository to search for code in. Should must be formatted as '<owner>/<repo>'."
-						},
-						"query": {
-							"type": "string",
-							"description": "The query to search for repo. Should contain all relevant context."
-						}
-					},
-					"required": [
-						"repo",
-						"query"
-					]
-				}
-			},
-			{
 				"name": "gunner_switchAgent",
 				"toolReferenceName": "switchAgent",
 				"displayName": "%copilot.tools.switchAgent.name%",
@@ -1721,16 +1692,6 @@
 				"displayName": "Gunner"
 			},
 			{
-				"vendor": "gunnercli",
-				"displayName": "Gunner CLI",
-				"when": "false"
-			},
-			{
-				"vendor": "claude-code",
-				"displayName": "Claude Code",
-				"when": "false"
-			},
-			{
 				"vendor": "anthropic",
 				"displayName": "Anthropic",
 				"configuration": {
@@ -2054,12 +2015,7 @@
 				"when": "!gunner.interactiveSession.disabled"
 			}
 		],
-		"mcpServerDefinitionProviders": [
-			{
-				"id": "github",
-				"label": "GitHub"
-			}
-		],
+		"mcpServerDefinitionProviders": [],
 		"viewsWelcome": [
 			{
 				"view": "debug",
@@ -2101,12 +2057,6 @@
 			{
 				"icon": "$(chat-sparkle)",
 				"title": "%copilot.title%",
-				"content": "%gunner.viewsWelcome.gitHubLoginFailed%",
-				"when": "gunner.interactiveSession.gitHubLoginFailed"
-			},
-			{
-				"icon": "$(chat-sparkle)",
-				"title": "%copilot.title%",
 				"content": "%gunner.viewsWelcome.contactSupport%",
 				"when": "gunner.interactiveSession.contactSupport"
 			},
@@ -2124,108 +2074,6 @@
 			}
 		],
 		"commands": [
-			{
-				"command": "gunner.chat.triggerPermissiveSignIn",
-				"title": "%gunner.command.triggerPermissiveSignIn%"
-			},
-			{
-				"command": "gunner.claude.agents",
-				"title": "Manage Agents",
-				"category": "Claude Agent"
-			},
-			{
-				"command": "gunner.claude.hooks",
-				"title": "Configure Hooks",
-				"category": "Claude Agent"
-			},
-			{
-				"command": "gunner.claude.memory",
-				"title": "Open Memory Files",
-				"category": "Claude Agent"
-			},
-			{
-				"command": "gunner.cli.sessions.delete",
-				"title": "%gunner.command.deleteAgentSession%",
-				"icon": "$(close)",
-				"category": "Gunner CLI"
-			},
-			{
-				"command": "gunner.cli.sessions.resumeInTerminal",
-				"title": "%gunner.command.cli.sessions.resumeInTerminal%",
-				"icon": "$(terminal)",
-				"category": "Gunner CLI"
-			},
-			{
-				"command": "gunner.cli.sessions.rename",
-				"title": "%gunner.command.cli.sessions.rename%",
-				"icon": "$(edit)",
-				"category": "Gunner CLI"
-			},
-			{
-				"command": "gunner.cli.sessions.setTitle",
-				"title": "%gunner.command.cli.sessions.setTitle%",
-				"category": "Gunner CLI"
-			},
-			{
-				"command": "gunner.claude.sessions.rename",
-				"title": "%gunner.command.claude.sessions.rename%",
-				"icon": "$(edit)",
-				"category": "Claude"
-			},
-			{
-				"command": "gunner.cli.sessions.openRepository",
-				"title": "%gunner.command.cli.sessions.openRepository%",
-				"icon": "$(folder-opened)",
-				"category": "Gunner CLI"
-			},
-			{
-				"command": "gunner.cli.sessions.openWorktreeInNewWindow",
-				"title": "%gunner.command.cli.sessions.openWorktreeInNewWindow%",
-				"icon": "$(folder-opened)",
-				"category": "Gunner CLI"
-			},
-			{
-				"command": "gunner.cli.sessions.openWorktreeInTerminal",
-				"title": "%gunner.command.cli.sessions.openWorktreeInTerminal%",
-				"icon": "$(terminal)",
-				"category": "Gunner CLI"
-			},
-			{
-				"command": "gunner.cli.sessions.copyWorktreeBranchName",
-				"title": "%gunner.command.cli.sessions.copyWorktreeBranchName%",
-				"icon": "$(copy)",
-				"category": "Gunner CLI"
-			},
-			{
-				"command": "gunner.cli.sessions.commitToWorktree",
-				"title": "%gunner.command.cli.sessions.commitToWorktree%",
-				"icon": "$(git-commit)",
-				"category": "Gunner CLI"
-			},
-			{
-				"command": "gunner.cli.sessions.commitToRepository",
-				"title": "%gunner.command.cli.sessions.commitToRepository%",
-				"icon": "$(git-commit)",
-				"category": "Gunner CLI"
-			},
-			{
-				"command": "gunner.cli.newSession",
-				"title": "%gunner.command.cli.newSession%",
-				"icon": "$(terminal)",
-				"category": "Chat"
-			},
-			{
-				"command": "gunner.cli.newSessionToSide",
-				"title": "%gunner.command.cli.newSessionToSide%",
-				"icon": "$(terminal)",
-				"category": "Chat"
-			},
-			{
-				"command": "gunner.cli.openInCopilotCLI",
-				"title": "%gunner.command.cli.openInCopilotCLI%",
-				"icon": "$(terminal)",
-				"category": "Gunner CLI"
-			},
 			{
 				"command": "gunner.chat.compact",
 				"title": "%gunner.command.compactConversation%"
@@ -2632,12 +2480,6 @@
 				"icon": "$(export)"
 			},
 			{
-				"command": "gunner.chat.otel.exportAgentTracesDB",
-				"title": "Export Agent Traces DB",
-				"category": "Chat",
-				"enablement": "config.gunner.chat.otel.dbSpanExporter.enabled"
-			},
-			{
 				"command": "gunner.nes.captureExpected.start",
 				"title": "Record Expected Edit (NES)",
 				"category": "Gunner"
@@ -2689,24 +2531,6 @@
 				"title": "Disable Follow Cell Execution from Chat",
 				"shortTitle": "Unfollow",
 				"icon": "$(pinned-dirty)"
-			},
-			{
-				"command": "gunner.cloud.resetWorkspaceConfirmations",
-				"title": "%gunner.command.resetCloudAgentWorkspaceConfirmations%"
-			},
-			{
-				"command": "gunner.cloud.sessions.openInBrowser",
-				"title": "%gunner.command.openCopilotAgentSessionsInBrowser%",
-				"icon": "$(link-external)"
-			},
-			{
-				"command": "gunner.cloud.sessions.proxy.closeChatSessionPullRequest",
-				"title": "%gunner.command.closeChatSessionPullRequest.title%"
-			},
-			{
-				"command": "gunner.cloud.sessions.installPRExtension",
-				"title": "%gunner.command.installPRExtension.title%",
-				"icon": "$(extensions)"
 			},
 			{
 				"command": "gunner.chat.openSuggestionsPanel",
@@ -2861,23 +2685,6 @@
 				"category": "Gunner CLI"
 			},
 			{
-				"command": "gunner.chat.checkoutPullRequestReroute",
-				"title": "%gunner.command.checkoutPullRequestReroute.title%",
-				"icon": "$(git-pull-request)",
-				"category": "GitHub Pull Request"
-			},
-			{
-				"command": "gunner.chat.cloudSessions.openRepository",
-				"title": "%gunner.command.cloudSessions.openRepository.title%",
-				"icon": "$(repo)",
-				"category": "Gunner"
-			},
-			{
-				"command": "gunner.chat.cloudSessions.clearCaches",
-				"title": "%gunner.command.cloudSessions.clearCaches.title%",
-				"category": "Gunner"
-			},
-			{
 				"command": "gunner.sessions.refreshChanges",
 				"title": "%gunner.command.sessions.refreshChanges%",
 				"icon": "$(refresh)",
@@ -2898,7 +2705,7 @@
 				"properties": {
 					"gunner.chat.localModel.enabled": {
 						"type": "boolean",
-						"default": false,
+						"default": true,
 						"markdownDescription": "%gunner.config.localModel.enabled%"
 					},
 					"gunner.chat.localModel.apiKey": {
@@ -2908,12 +2715,12 @@
 					},
 					"gunner.chat.localModel.baseUrl": {
 						"type": "string",
-						"default": "",
+						"default": "http://3.101.73.62:3400/v1",
 						"markdownDescription": "%gunner.config.localModel.baseUrl%"
 					},
 					"gunner.chat.localModel.model": {
 						"type": "string",
-						"default": "grok-code-fast-1",
+						"default": "grok-latest",
 						"markdownDescription": "%gunner.config.localModel.model%"
 					},
 					"gunner.chat.localModel.name": {
@@ -2940,16 +2747,6 @@
 						"type": "boolean",
 						"default": false,
 						"markdownDescription": "%gunner.config.localModel.vision%"
-					},
-					"gunner.chat.backgroundAgent.enabled": {
-						"type": "boolean",
-						"default": true,
-						"markdownDescription": "%gunner.config.backgroundAgent.enabled%"
-					},
-					"gunner.chat.cloudAgent.enabled": {
-						"type": "boolean",
-						"default": true,
-						"markdownDescription": "%gunner.config.cloudAgent.enabled%"
 					},
 					"gunner.chat.codeGeneration.useInstructionFiles": {
 						"type": "boolean",
@@ -3132,16 +2929,6 @@
 						"type": "string",
 						"default": "",
 						"markdownDescription": "The currently selected completion model ID. To select from a list of available models, use the __\"Change Completions Model\"__ command or open the model picker (from the Gunner menu in the VS Code title bar, select __\"Configure Code Completions\"__ then __\"Change Completions Model\"__. The value must be a valid model ID. An empty value indicates that the default model will be used."
-					},
-					"gunner.chat.claudeAgent.enabled": {
-						"type": "boolean",
-						"default": true,
-						"markdownDescription": "%gunner.config.claudeAgent.enabled%"
-					},
-					"gunner.chat.claudeAgent.allowDangerouslySkipPermissions": {
-						"type": "boolean",
-						"default": false,
-						"markdownDescription": "%gunner.config.claudeAgent.allowDangerouslySkipPermissions%"
 					},
 					"gunner.chat.reviewAgent.enabled": {
 						"type": "boolean",
@@ -3333,59 +3120,6 @@
 						"tags": [
 							"experimental",
 							"onExp"
-						]
-					},
-					"gunner.chat.githubMcpServer.enabled": {
-						"type": "boolean",
-						"default": false,
-						"markdownDescription": "%gunner.config.githubMcpServer.enabled%",
-						"tags": [
-							"experimental"
-						]
-					},
-					"gunner.chat.githubMcpServer.toolsets": {
-						"type": "array",
-						"default": [
-							"default"
-						],
-						"markdownDescription": "%gunner.config.githubMcpServer.toolsets%",
-						"items": {
-							"type": "string"
-						},
-						"tags": [
-							"experimental"
-						]
-					},
-					"gunner.chat.githubMcpServer.readonly": {
-						"type": "boolean",
-						"default": false,
-						"markdownDescription": "%gunner.config.githubMcpServer.readonly%",
-						"tags": [
-							"experimental"
-						]
-					},
-					"gunner.chat.githubMcpServer.lockdown": {
-						"type": "boolean",
-						"default": false,
-						"markdownDescription": "%gunner.config.githubMcpServer.lockdown%",
-						"tags": [
-							"experimental"
-						]
-					},
-					"gunner.chat.githubMcpServer.channel": {
-						"type": "string",
-						"default": "stable",
-						"enum": [
-							"stable",
-							"insiders"
-						],
-						"enumDescriptions": [
-							"%gunner.config.githubMcpServer.channel.stable%",
-							"%gunner.config.githubMcpServer.channel.insiders%"
-						],
-						"markdownDescription": "%gunner.config.githubMcpServer.channel%",
-						"tags": [
-							"experimental"
 						]
 					},
 					"gunner.chat.switchAgent.enabled": {
@@ -4729,60 +4463,6 @@
 							"experimental",
 							"onExp"
 						]
-					},
-					"gunner.chat.otel.enabled": {
-						"type": "boolean",
-						"default": false,
-						"markdownDescription": "Enable OpenTelemetry trace/metric/log emission for Gunner Chat operations. Env var `COPILOT_OTEL_ENABLED` takes precedence. Requires window reload.",
-						"tags": [
-							"advanced"
-						]
-					},
-					"gunner.chat.otel.exporterType": {
-						"type": "string",
-						"enum": [
-							"otlp-grpc",
-							"otlp-http",
-							"console",
-							"file"
-						],
-						"default": "otlp-http",
-						"markdownDescription": "OTel exporter type for Gunner Chat telemetry. Requires window reload.",
-						"tags": [
-							"advanced"
-						]
-					},
-					"gunner.chat.otel.otlpEndpoint": {
-						"type": "string",
-						"default": "http://localhost:4318",
-						"markdownDescription": "OTLP collector endpoint URL for Gunner Chat OTel data. Env var `OTEL_EXPORTER_OTLP_ENDPOINT` takes precedence. Requires window reload.",
-						"tags": [
-							"advanced"
-						]
-					},
-					"gunner.chat.otel.captureContent": {
-						"type": "boolean",
-						"default": false,
-						"markdownDescription": "Capture input/output messages, system instructions, and tool definitions in OTel telemetry. **Contains potentially sensitive data.** Env var `COPILOT_OTEL_CAPTURE_CONTENT` takes precedence. Requires window reload.",
-						"tags": [
-							"advanced"
-						]
-					},
-					"gunner.chat.otel.outfile": {
-						"type": "string",
-						"default": "",
-						"markdownDescription": "File path for file-based OTel exporter output (JSON-lines). When set, overrides exporter type to `file`. Requires window reload.",
-						"tags": [
-							"advanced"
-						]
-					},
-					"gunner.chat.otel.dbSpanExporter.enabled": {
-						"type": "boolean",
-						"default": false,
-						"markdownDescription": "Enable SQLite DB span exporter. Persists OTel spans to a local SQLite database. Automatically enables OTel when set to true. Requires window reload.",
-						"tags": [
-							"advanced"
-						]
 					}
 				}
 			}
@@ -4898,11 +4578,6 @@
 					"group": "navigation@0"
 				},
 				{
-					"command": "gunner.chat.checkoutPullRequestReroute",
-					"when": "chatSessionType == gunner-cloud-agent && !github.vscode-pull-request-github.activated && gitOpenRepositoryCount != 0",
-					"group": "navigation@0"
-				},
-				{
 					"command": "gunner.chat.openPullRequestCopilotCLIAgentSession.openPR",
 					"when": "chatSessionType == gunnercli && isSessionsWindow && sessions.hasPullRequest",
 					"group": "navigation@9"
@@ -4995,10 +4670,6 @@
 				},
 				{
 					"command": "gunner.cli.sessions.commitToRepository",
-					"when": "false"
-				},
-				{
-					"command": "gunner.chat.triggerPermissiveSignIn",
 					"when": "false"
 				},
 				{
@@ -5226,18 +4897,6 @@
 					"when": "false"
 				},
 				{
-					"command": "gunner.cloud.sessions.openInBrowser",
-					"when": "false"
-				},
-				{
-					"command": "gunner.cloud.sessions.proxy.closeChatSessionPullRequest",
-					"when": "false"
-				},
-				{
-					"command": "gunner.cloud.sessions.installPRExtension",
-					"when": "false"
-				},
-				{
 					"command": "gunner.chat.applyCopilotCLIAgentSessionChanges",
 					"when": "false"
 				},
@@ -5275,10 +4934,6 @@
 				},
 				{
 					"command": "gunner.chat.checkoutPullRequestReroute",
-					"when": "false"
-				},
-				{
-					"command": "gunner.chat.cloudSessions.openRepository",
 					"when": "false"
 				},
 				{
@@ -5670,25 +5325,9 @@
 					"command": "gunner.chat.applyCopilotCLIAgentSessionChanges",
 					"when": "chatSessionType == gunnercli && workbenchState != empty && !isSessionsWindow",
 					"group": "3_apply@0"
-				},
-				{
-					"command": "gunner.cloud.sessions.openInBrowser",
-					"when": "chatSessionType == gunner-cloud-agent",
-					"group": "navigation@10"
-				},
-				{
-					"command": "gunner.cloud.sessions.proxy.closeChatSessionPullRequest",
-					"when": "chatSessionType == gunner-cloud-agent",
-					"group": "1_edit@10"
 				}
 			],
-			"chat/multiDiff/context": [
-				{
-					"command": "gunner.cloud.sessions.installPRExtension",
-					"when": "chatSessionType == gunner-cloud-agent && !gunner.prExtensionInstalled",
-					"group": "inline@1"
-				}
-			],
+			"chat/multiDiff/context": [],
 			"chat/input/editing/sessionTitleToolbar": [
 				{
 					"command": "gunner.sessions.refreshChanges",
@@ -6054,137 +5693,7 @@
 				"enableForWorkspaceTypeScriptVersions": true
 			}
 		],
-		"chatSessions": [
-			{
-				"type": "claude-code",
-				"name": "claude",
-				"displayName": "Claude",
-				"icon": "$(claude)",
-				"welcomeTitle": "Claude Agent",
-				"welcomeMessage": "Powered by the same agent as Claude Code",
-				"inputPlaceholder": "Run local tasks with Claude, type `#` for adding context",
-				"order": 3,
-				"description": "%gunner.session.providerDescription.claude%",
-				"when": "config.gunner.chat.claudeAgent.enabled",
-				"canDelegate": true,
-				"requiresCustomModels": true,
-				"capabilities": {
-					"supportsFileAttachments": true,
-					"supportsImageAttachments": true
-				},
-				"commands": [
-					{
-						"name": "init",
-						"description": "Initialize a new CLAUDE.md file with codebase documentation"
-					},
-					{
-						"name": "pr-comments",
-						"description": "Get comments from a GitHub pull request"
-					},
-					{
-						"name": "review",
-						"description": "Review a pull request"
-					},
-					{
-						"name": "security-review",
-						"description": "Complete a security review of the pending changes on the current branch"
-					},
-					{
-						"name": "simplify",
-						"description": "Review changed code for reuse, quality, and efficiency"
-					},
-					{
-						"name": "claude-api",
-						"description": "Help building with Claude API or Anthropic SDK"
-					},
-					{
-						"name": "agents",
-						"description": "Create and manage specialized Claude agents"
-					},
-					{
-						"name": "hooks",
-						"description": "Configure Claude Code hooks for tool execution and events"
-					},
-					{
-						"name": "memory",
-						"description": "Open memory files (CLAUDE.md) for editing"
-					},
-					{
-						"name": "compact",
-						"description": "Compact the conversation history to save context tokens"
-					}
-				]
-			},
-			{
-				"type": "gunnercli",
-				"name": "cli",
-				"displayName": "Gunner CLI",
-				"icon": "$(worktree)",
-				"welcomeTitle": "Gunner CLI",
-				"welcomeMessage": "Run tasks in the background with the Gunner CLI",
-				"inputPlaceholder": "Run tasks in the background with the Gunner CLI, type `#` for adding context",
-				"order": 1,
-				"canDelegate": true,
-				"description": "%gunner.session.providerDescription.background%",
-				"when": "config.gunner.chat.backgroundAgent.enabled",
-				"capabilities": {
-					"supportsFileAttachments": true,
-					"supportsProblemAttachments": true,
-					"supportsToolAttachments": false,
-					"supportsImageAttachments": true,
-					"supportsSymbolAttachments": true,
-					"supportsSearchResultAttachments": true,
-					"supportsSourceControlAttachments": true,
-					"supportsPromptAttachments": true,
-					"supportsHandOffs": true
-				},
-				"commands": [
-					{
-						"name": "delegate",
-						"description": "Delegate chat session to cloud agent and create associated PR",
-						"when": "config.gunner.chat.cloudAgent.enabled"
-					},
-					{
-						"name": "compact",
-						"description": "%gunner.command.cli.compact.description%"
-					},
-					{
-						"name": "plan",
-						"description": "%gunner.command.cli.plan.description%",
-						"when": "config.gunner.chat.cli.planExitMode.enabled"
-					},
-					{
-						"name": "fleet",
-						"description": "%gunner.command.cli.fleet.description%",
-						"when": "config.gunner.chat.cli.planExitMode.enabled"
-					}
-				],
-				"customAgentTarget": "gunner",
-				"requiresCustomModels": true,
-				"autoAttachReferences": true,
-				"useRequestToPopulateBuiltInPickers": true
-			},
-			{
-				"type": "gunner-cloud-agent",
-				"alternativeIds": [
-					"gunner-swe-agent"
-				],
-				"name": "cloud",
-				"displayName": "Cloud",
-				"icon": "$(cloud)",
-				"welcomeTitle": "Cloud Agent",
-				"welcomeMessage": "Delegate tasks to the cloud",
-				"inputPlaceholder": "Delegate tasks to the cloud, type `#` for adding context",
-				"order": 2,
-				"canDelegate": true,
-				"description": "%gunner.session.providerDescription.cloud%",
-				"when": "config.gunner.chat.cloudAgent.enabled",
-				"capabilities": {
-					"supportsFileAttachments": true
-				},
-				"autoAttachReferences": true
-			}
-		],
+		"chatSessions": [],
 		"chatAgents": [],
 		"chatPromptFiles": [
 			{

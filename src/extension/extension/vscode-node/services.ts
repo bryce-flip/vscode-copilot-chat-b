@@ -3,15 +3,11 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as os from 'os';
-import * as path from 'path';
-import { ExtensionContext, ExtensionMode, env, workspace } from 'vscode';
+import { ExtensionContext, ExtensionMode, env } from 'vscode';
 import { IAuthenticationService } from '../../../platform/authentication/common/authentication';
 import { ICopilotTokenManager } from '../../../platform/authentication/common/copilotTokenManager';
 import { StaticGitHubAuthenticationService } from '../../../platform/authentication/common/staticGitHubAuthenticationService';
 import { createStaticGitHubTokenProvider, getOrCreateTestingCopilotTokenManager, LocalOpenAIModelCopilotTokenManager } from '../../../platform/authentication/node/copilotTokenManager';
-import { AuthenticationService } from '../../../platform/authentication/vscode-node/authenticationService';
-import { VSCodeCopilotTokenManager } from '../../../platform/authentication/vscode-node/copilotTokenManager';
 import { IChatAgentService } from '../../../platform/chat/common/chatAgents';
 import { IChatDebugFileLoggerService } from '../../../platform/chat/common/chatDebugFileLoggerService';
 import { IChatHookService } from '../../../platform/chat/common/chatHookService';
@@ -23,7 +19,6 @@ import { NodeHookExecutor } from '../../../platform/chat/node/hookExecutor';
 import { IChunkingEndpointClient } from '../../../platform/chunking/common/chunkingEndpointClient';
 import { ChunkingEndpointClientImpl } from '../../../platform/chunking/common/chunkingEndpointClientImpl';
 import { INaiveChunkingService, NaiveChunkingService } from '../../../platform/chunking/node/naiveChunkerService';
-import { ConfigKey } from '../../../platform/configuration/common/configurationService';
 import { IDevContainerConfigurationService } from '../../../platform/devcontainer/common/devContainerConfigurationService';
 import { IDiffService } from '../../../platform/diff/common/diffService';
 import { DiffServiceImpl } from '../../../platform/diff/node/diffServiceImpl';
@@ -58,15 +53,13 @@ import { FetcherService } from '../../../platform/networking/vscode-node/fetcher
 import { resolveOTelConfig } from '../../../platform/otel/common/otelConfig';
 import { IOTelService } from '../../../platform/otel/common/otelService';
 import { InMemoryOTelService } from '../../../platform/otel/node/inMemoryOTelService';
-import { IOTelSqliteStore, OTelSqliteStore } from '../../../platform/otel/node/sqlite/otelSqliteStore';
 import { IParserService } from '../../../platform/parser/node/parserService';
 import { ParserServiceImpl } from '../../../platform/parser/node/parserServiceImpl';
 import { IProxyModelsService } from '../../../platform/proxyModels/common/proxyModelsService';
 import { ProxyModelsService } from '../../../platform/proxyModels/node/proxyModelsService';
 import { AdoCodeSearchService, IAdoCodeSearchService } from '../../../platform/remoteCodeSearch/common/adoCodeSearchService';
 import { GithubCodeSearchService, IGithubCodeSearchService } from '../../../platform/remoteCodeSearch/common/githubCodeSearchService';
-import { ICodeSearchAuthenticationService } from '../../../platform/remoteCodeSearch/node/codeSearchRepoAuth';
-import { VsCodeCodeSearchAuthenticationService } from '../../../platform/remoteCodeSearch/vscode-node/codeSearchRepoAuth';
+import { BasicCodeSearchAuthenticationService, ICodeSearchAuthenticationService } from '../../../platform/remoteCodeSearch/node/codeSearchRepoAuth';
 import { IDocsSearchClient } from '../../../platform/remoteSearch/common/codeOrDocsSearchClient';
 import { DocsSearchClient } from '../../../platform/remoteSearch/node/codeOrDocsSearchClientImpl';
 import { IRequestLogger } from '../../../platform/requestLogger/node/requestLogger';
@@ -78,9 +71,6 @@ import { ISettingsEditorSearchService } from '../../../platform/settingsEditor/c
 import { IExperimentationService, NullExperimentationService } from '../../../platform/telemetry/common/nullExperimentationService';
 import { NullTelemetryService } from '../../../platform/telemetry/common/nullTelemetryService';
 import { ITelemetryService, ITelemetryUserConfig, TelemetryUserConfigImpl } from '../../../platform/telemetry/common/telemetry';
-import { APP_INSIGHTS_KEY_ENHANCED, APP_INSIGHTS_KEY_STANDARD } from '../../../platform/telemetry/node/azureInsights';
-import { MicrosoftExperimentationService } from '../../../platform/telemetry/vscode-node/microsoftExperimentationService';
-import { TelemetryService } from '../../../platform/telemetry/vscode-node/telemetryServiceImpl';
 import { IWorkspaceMutationManager } from '../../../platform/testing/common/workspaceMutationManager';
 import { ISetupTestsDetector, SetupTestsDetector } from '../../../platform/testing/node/setupTestDetector';
 import { ITestDepsResolver, TestDepsResolver } from '../../../platform/testing/node/testDepsResolver';
@@ -179,11 +169,8 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 	builder.define(IImageService, new SyncDescriptor(VSCodeImageServiceImpl));
 
 	builder.define(ITelemetryUserConfig, new SyncDescriptor(TelemetryUserConfigImpl, [undefined, undefined]));
-	const internalAIKey = extensionContext.extension.packageJSON.internalAIKey ?? '';
-	const internalLargeEventAIKey = extensionContext.extension.packageJSON.internalLargeStorageAriaKey ?? '';
-	const ariaKey = extensionContext.extension.packageJSON.ariaKey ?? '';
 	if (isTestMode || isScenarioAutomation) {
-		setupTelemetry(builder, extensionContext, internalAIKey, internalLargeEventAIKey, ariaKey);
+		setupTelemetry(builder);
 		// If we're in testing mode, then most code will be called from an actual test,
 		// and not from here. However, some objects will capture the `accessor` we pass
 		// here and then re-use it later. This is particularly the case for those objects
@@ -191,15 +178,8 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 		// method parameters.
 		builder.define(ICopilotTokenManager, getOrCreateTestingCopilotTokenManager(env.devDeviceId));
 	} else {
-		setupTelemetry(builder, extensionContext, internalAIKey, internalLargeEventAIKey, ariaKey);
-		const localModelEnabled = workspace.getConfiguration('gunner').get<boolean>(ConfigKey.LocalModelEnabled.id) === true;
-		const localModelApiKey = (workspace.getConfiguration('gunner').get<string>(ConfigKey.LocalModelApiKey.id) ?? '').trim();
-		const localModelBaseUrl = (workspace.getConfiguration('gunner').get<string>(ConfigKey.LocalModelBaseUrl.id) ?? '').trim();
-		if (localModelEnabled && localModelApiKey && localModelBaseUrl) {
-			builder.define(ICopilotTokenManager, new SyncDescriptor(LocalOpenAIModelCopilotTokenManager));
-		} else {
-			builder.define(ICopilotTokenManager, new SyncDescriptor(VSCodeCopilotTokenManager));
-		}
+		setupTelemetry(builder);
+		builder.define(ICopilotTokenManager, new SyncDescriptor(LocalOpenAIModelCopilotTokenManager));
 	}
 
 	if (isScenarioAutomation) {
@@ -207,7 +187,8 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 		builder.define(IEndpointProvider, new SyncDescriptor(ScenarioAutomationEndpointProviderImpl));
 		builder.define(IIgnoreService, new SyncDescriptor(NullIgnoreService));
 	} else {
-		builder.define(IAuthenticationService, new SyncDescriptor(AuthenticationService));
+		// No GitHub provider is supplied, so callers can never prompt for sign-in.
+		builder.define(IAuthenticationService, new SyncDescriptor(StaticGitHubAuthenticationService, [undefined]));
 		builder.define(IEndpointProvider, new SyncDescriptor(ProductionEndpointProvider));
 		builder.define(IIgnoreService, new SyncDescriptor(VsCodeIgnoreService));
 	}
@@ -241,7 +222,7 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 	builder.define(IChatMLFetcher, new SyncDescriptor(ChatMLFetcherImpl));
 	builder.define(IChatWebSocketManager, new SyncDescriptor(ChatWebSocketManager));
 	builder.define(IFeedbackReporter, new SyncDescriptor(FeedbackReporter));
-	builder.define(IApiEmbeddingsIndex, new SyncDescriptor(ApiEmbeddingsIndex, [/*useRemoteCache*/ true]));
+	builder.define(IApiEmbeddingsIndex, new SyncDescriptor(ApiEmbeddingsIndex, [/*useRemoteCache*/ false]));
 	builder.define(IGithubApiFetcherService, new SyncDescriptor(GithubApiFetcherService));
 	builder.define(IGithubCodeSearchService, new SyncDescriptor(GithubCodeSearchService));
 	builder.define(IAdoCodeSearchService, new SyncDescriptor(AdoCodeSearchService));
@@ -260,7 +241,8 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 	builder.define(ILanguageContextService, new SyncDescriptor(LanguageContextServiceImpl));
 	builder.define(ILanguageContextProviderService, new SyncDescriptor(LanguageContextProviderService));
 	builder.define(IWorkspaceListenerService, new SyncDescriptor(WorkspacListenerService));
-	builder.define(ICodeSearchAuthenticationService, new SyncDescriptor(VsCodeCodeSearchAuthenticationService));
+	// Avoid the VS Code implementation, which presents GitHub/Azure sign-in dialogs.
+	builder.define(ICodeSearchAuthenticationService, new SyncDescriptor(BasicCodeSearchAuthenticationService));
 	builder.define(ITodoListContextProvider, new SyncDescriptor(TodoListContextProvider));
 	builder.define(IGithubAvailableEmbeddingTypesService, new SyncDescriptor(GithubAvailableEmbeddingTypesService));
 	builder.define(IRerankerService, new SyncDescriptor(RerankerService));
@@ -273,66 +255,22 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 	builder.define(IGitHubOrgChatResourcesService, new SyncDescriptor(GitHubOrgChatResourcesService));
 	builder.define(IToolResultContentRenderer, new SyncDescriptor(ToolResultContentRenderer));
 
-	// OTel SQLite store — created lazily, DB file only appears when dbSpanExporter.enabled is true
-	const otelDbPath = extensionContext.globalStorageUri
-		? path.join(extensionContext.globalStorageUri.fsPath, 'agent-traces.db')
-		: path.join(os.tmpdir(), 'copilot-agent-traces.db');
-	const otelSqliteStore = new OTelSqliteStore(otelDbPath);
-	builder.define(IOTelSqliteStore, otelSqliteStore);
-
-	// OTel service — resolve config from env + settings, create appropriate impl
-	const otelSettings = workspace.getConfiguration('gunner.chat.otel');
+	// The local-only build keeps trace events in memory and never creates an exporter.
 	const otelConfig = resolveOTelConfig({
-		env: process.env,
-		settingEnabled: otelSettings.get<boolean>('enabled'),
-		settingExporterType: otelSettings.get<'otlp-grpc' | 'otlp-http' | 'console' | 'file'>('exporterType'),
-		settingOtlpEndpoint: otelSettings.get<string>('otlpEndpoint'),
-		settingCaptureContent: otelSettings.get<boolean>('captureContent'),
-		settingOutfile: otelSettings.get<string>('outfile') || undefined,
-		settingDbSpanExporter: otelSettings.get<boolean>('dbSpanExporter.enabled'),
+		env: {},
+		settingEnabled: false,
 		extensionVersion: extensionContext.extension.packageJSON.version ?? '0.0.0',
 		sessionId: env.sessionId,
 	});
-	if (otelConfig.enabled) {
-		// Dynamic import to avoid loading OTel SDK when disabled
-		const { NodeOTelService } = require('../../../platform/otel/node/otelServiceImpl') as typeof import('../../../platform/otel/node/otelServiceImpl');
-		// Log callback routes OTel messages to the extension output channel (via ILogService wired in OTelContrib)
-		// During early init before ILogService is available, messages go to console as fallback
-		const logFn: import('../../../platform/otel/node/otelServiceImpl').OTelLogFn = (level, msg) => {
-			if (level === 'error') { console.error(msg); }
-			else if (level === 'warn') { console.warn(msg); }
-			else { console.info(msg); }
-		};
-		builder.define(IOTelService, new NodeOTelService(otelConfig, logFn, otelConfig.dbSpanExporter ? otelSqliteStore : undefined));
-	} else {
-		builder.define(IOTelService, new InMemoryOTelService(otelConfig));
-	}
+	builder.define(IOTelService, new InMemoryOTelService(otelConfig));
 }
 
-function setupMSFTExperimentationService(builder: IInstantiationServiceBuilder, extensionContext: ExtensionContext) {
-	if (ExtensionMode.Production === extensionContext.extensionMode && !isScenarioAutomation) {
-		// Intitiate the experimentation service
-		builder.define(IExperimentationService, new SyncDescriptor(MicrosoftExperimentationService));
-	} else {
-		builder.define(IExperimentationService, new NullExperimentationService());
-	}
+function setupMSFTExperimentationService(builder: IInstantiationServiceBuilder) {
+	builder.define(IExperimentationService, new NullExperimentationService());
 }
 
-function setupTelemetry(builder: IInstantiationServiceBuilder, extensionContext: ExtensionContext, internalAIKey: string, internalLargeEventAIKey: string, externalAIKey: string) {
-
-	if (ExtensionMode.Production === extensionContext.extensionMode && !isScenarioAutomation) {
-		builder.define(ITelemetryService, new SyncDescriptor(TelemetryService, [
-			extensionContext.extension.packageJSON.name,
-			internalAIKey,
-			internalLargeEventAIKey,
-			externalAIKey,
-			APP_INSIGHTS_KEY_STANDARD,
-			APP_INSIGHTS_KEY_ENHANCED,
-		]));
-	} else {
-		// If we're developing or testing we don't want telemetry to be sent, so we turn it off
-		builder.define(ITelemetryService, new NullTelemetryService());
-	}
-
-	setupMSFTExperimentationService(builder, extensionContext);
+function setupTelemetry(builder: IInstantiationServiceBuilder) {
+	// Local-only builds never send telemetry or request experiment assignments.
+	builder.define(ITelemetryService, new NullTelemetryService());
+	setupMSFTExperimentationService(builder);
 }

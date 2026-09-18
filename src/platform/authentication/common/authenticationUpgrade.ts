@@ -43,3 +43,29 @@ export interface IAuthenticationChatUpgradeService {
 	 */
 	handleConfirmationRequest(stream: ChatResponseStream, request: ChatRequest, history: ChatContext['history']): Promise<ChatRequest>;
 }
+
+/**
+ * Local-only builds never request GitHub scopes. Keeping this service available
+ * lets the normal chat request pipeline run without carrying an auth UI path.
+ */
+export class NullAuthenticationChatUpgradeService implements IAuthenticationChatUpgradeService {
+	declare readonly _serviceBrand: undefined;
+
+	readonly onDidGrantAuthUpgrade = Event.None;
+
+	async shouldRequestPermissiveSessionUpgrade(): Promise<boolean> {
+		return false;
+	}
+
+	async showPermissiveSessionModal(_skipRepeatCheck?: boolean): Promise<boolean> {
+		return false;
+	}
+
+	showPermissiveSessionUpgradeInChat(_stream: ChatResponseStream, _data: ChatRequest, _detail?: string, _context?: ChatContext): void {
+		// GitHub authorization is unavailable in the local-only build.
+	}
+
+	async handleConfirmationRequest(_stream: ChatResponseStream, request: ChatRequest, _history: ChatContext['history']): Promise<ChatRequest> {
+		return request;
+	}
+}

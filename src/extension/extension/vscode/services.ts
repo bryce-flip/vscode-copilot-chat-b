@@ -4,8 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ExtensionContext, ExtensionMode, l10n } from 'vscode';
-import { IAuthenticationChatUpgradeService } from '../../../platform/authentication/common/authenticationUpgrade';
-import { AuthenticationChatUpgradeService } from '../../../platform/authentication/common/authenticationUpgradeService';
+import { IAuthenticationChatUpgradeService, NullAuthenticationChatUpgradeService } from '../../../platform/authentication/common/authenticationUpgrade';
 import { CopilotTokenStore, ICopilotTokenStore } from '../../../platform/authentication/common/copilotTokenStore';
 import { BlockedExtensionService, IBlockedExtensionService } from '../../../platform/chat/common/blockedExtensionService';
 import { IChatQuotaService } from '../../../platform/chat/common/chatQuotaService';
@@ -24,8 +23,7 @@ import { DebugOutputServiceImpl } from '../../../platform/debug/vscode/debugOutp
 import { IDialogService } from '../../../platform/dialog/common/dialogService';
 import { DialogServiceImpl } from '../../../platform/dialog/vscode/dialogServiceImpl';
 import { EditSurvivalTrackerService, IEditSurvivalTrackerService } from '../../../platform/editSurvivalTracking/common/editSurvivalTrackerService';
-import { IEmbeddingsComputer } from '../../../platform/embeddings/common/embeddingsComputer';
-import { RemoteEmbeddingsComputer } from '../../../platform/embeddings/common/remoteEmbeddingsComputer';
+import { IEmbeddingsComputer, NullEmbeddingsComputer } from '../../../platform/embeddings/common/embeddingsComputer';
 import { ICombinedEmbeddingIndex, VSCodeCombinedIndexImpl } from '../../../platform/embeddings/common/vscodeIndex';
 import { IEnvService, isScenarioAutomation } from '../../../platform/env/common/envService';
 import { EnvServiceImpl } from '../../../platform/env/vscode/envServiceImpl';
@@ -38,7 +36,6 @@ import { IGitExtensionService } from '../../../platform/git/common/gitExtensionS
 import { GitExtensionServiceImpl } from '../../../platform/git/vscode/gitExtensionServiceImpl';
 import { IOctoKitService } from '../../../platform/github/common/githubService';
 import { NullBaseOctoKitService } from '../../../platform/github/common/nullOctokitServiceImpl';
-import { OctoKitService } from '../../../platform/github/common/octoKitServiceImpl';
 import { IInteractiveSessionService } from '../../../platform/interactive/common/interactiveSessionService';
 import { InteractiveSessionServiceImpl } from '../../../platform/interactive/vscode/interactiveSessionServiceImpl';
 import { ILanguageDiagnosticsService } from '../../../platform/languages/common/languageDiagnosticsService';
@@ -143,7 +140,8 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 	builder.define(IChatQuotaService, new SyncDescriptor(ChatQuotaService));
 	builder.define(ITasksService, new SyncDescriptor(TasksService));
 	builder.define(IGitExtensionService, new SyncDescriptor(GitExtensionServiceImpl));
-	builder.define(IOctoKitService, isScenarioAutomation ? new SyncDescriptor(NullBaseOctoKitService) : new SyncDescriptor(OctoKitService));
+	// The local-only build must never make GitHub API calls.
+	builder.define(IOctoKitService, new SyncDescriptor(NullBaseOctoKitService));
 	builder.define(IReviewService, new SyncDescriptor(ReviewServiceImpl));
 	builder.define(ILanguageDiagnosticsService, new SyncDescriptor(LanguageDiagnosticsServiceImpl));
 	builder.define(ILanguageFeaturesService, new SyncDescriptor(LanguageFeaturesServiceImpl));
@@ -152,8 +150,8 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 	builder.define(IWorkspaceService, new SyncDescriptor(ExtensionTextDocumentManager));
 	builder.define(IMcpService, new SyncDescriptor(McpService));
 	builder.define(IExtensionsService, new SyncDescriptor(VSCodeExtensionsService));
-	builder.define(ICombinedEmbeddingIndex, new SyncDescriptor(VSCodeCombinedIndexImpl, [/*useRemoteCache*/ true]));
-	builder.define(IProjectTemplatesIndex, new SyncDescriptor(ProjectTemplatesIndex, [/*useRemoteCache*/ true]));
+	builder.define(ICombinedEmbeddingIndex, new SyncDescriptor(VSCodeCombinedIndexImpl, [/*useRemoteCache*/ false]));
+	builder.define(IProjectTemplatesIndex, new SyncDescriptor(ProjectTemplatesIndex, [/*useRemoteCache*/ false]));
 	builder.define(IBlockedExtensionService, new SyncDescriptor(BlockedExtensionService));
 	builder.define(IEditLogService, new SyncDescriptor(EditLogService));
 	builder.define(IMultiFileEditInternalTelemetryService, new SyncDescriptor(MultiFileEditInternalTelemetryService));
@@ -166,8 +164,8 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 	builder.define(IReleaseNotesService, new SyncDescriptor(ReleaseNotesService));
 	builder.define(ISnippyService, new SyncDescriptor(SnippyService));
 	builder.define(IInteractiveSessionService, new InteractiveSessionServiceImpl());
-	builder.define(IAuthenticationChatUpgradeService, new SyncDescriptor(AuthenticationChatUpgradeService));
-	builder.define(IEmbeddingsComputer, new SyncDescriptor(RemoteEmbeddingsComputer));
+	builder.define(IAuthenticationChatUpgradeService, new SyncDescriptor(NullAuthenticationChatUpgradeService));
+	builder.define(IEmbeddingsComputer, new SyncDescriptor(NullEmbeddingsComputer));
 	builder.define(IToolGroupingService, new SyncDescriptor(ToolGroupingService));
 	builder.define(IToolEmbeddingsComputer, new SyncDescriptor(ToolEmbeddingsComputer));
 	builder.define(IToolGroupingCache, new SyncDescriptor(ToolGroupingCache));
