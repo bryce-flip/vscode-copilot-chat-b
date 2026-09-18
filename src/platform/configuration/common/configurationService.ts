@@ -877,6 +877,17 @@ export namespace ConfigKey {
 
 	export const RateLimitAutoSwitchToAuto = defineSetting<boolean>('chat.rateLimitAutoSwitchToAuto', ConfigType.Simple, false, vBoolean());
 
+	/** Use a configured OpenAI-compatible endpoint instead of GitHub Copilot login. */
+	export const LocalModelEnabled = defineSetting<boolean>('chat.localModel.enabled', ConfigType.Simple, false, vBoolean());
+	export const LocalModelApiKey = defineSetting<string>('chat.localModel.apiKey', ConfigType.Simple, '', vString());
+	export const LocalModelBaseUrl = defineSetting<string>('chat.localModel.baseUrl', ConfigType.Simple, '', vString());
+	export const LocalModelId = defineSetting<string>('chat.localModel.model', ConfigType.Simple, 'grok-code-fast-1', vString());
+	export const LocalModelName = defineSetting<string>('chat.localModel.name', ConfigType.Simple, '', vString());
+	export const LocalModelMaxInputTokens = defineSetting<number>('chat.localModel.maxInputTokens', ConfigType.Simple, 120000, vNumber());
+	export const LocalModelMaxOutputTokens = defineSetting<number>('chat.localModel.maxOutputTokens', ConfigType.Simple, 32000, vNumber());
+	export const LocalModelToolCalling = defineSetting<boolean>('chat.localModel.toolCalling', ConfigType.Simple, true, vBoolean());
+	export const LocalModelVision = defineSetting<boolean>('chat.localModel.vision', ConfigType.Simple, false, vBoolean());
+
 	/** Use the Messages API instead of Chat Completions when supported */
 	export const UseAnthropicMessagesApi = defineSetting<boolean | undefined>('chat.anthropic.useMessagesApi', ConfigType.ExperimentBased, true);
 	/** Context editing mode for Anthropic Messages API. 'off' disables context editing. */

@@ -45,6 +45,9 @@ class AuthUpgradeAsk extends Disposable {
 
 	async run() {
 		await this.waitForChatEnabled();
+		if (this._authenticationService.copilotToken?.isLocalOpenAIModelUser) {
+			return;
+		}
 		this.registerListeners();
 		await this.showPrompt();
 	}
@@ -55,6 +58,10 @@ class AuthUpgradeAsk extends Disposable {
 		} catch (error) {
 			// likely due to the user canceling the auth flow
 			this._logService.error(error, 'Failed to get copilot token');
+		}
+
+		if (this._authenticationService.copilotToken !== undefined) {
+			return;
 		}
 
 		await Event.toPromise(

@@ -52,6 +52,10 @@ export class AuthenticationChatUpgradeService extends Disposable implements IAut
 	async shouldRequestPermissiveSessionUpgrade(): Promise<boolean> {
 		let reason: string = 'true';
 		try {
+			if (this._authenticationService.copilotToken?.isLocalOpenAIModelUser) {
+				reason = 'false - local openai model';
+				return false;
+			}
 			// We don't want to be annoying
 			if (this.hasRequestedPermissiveSessionUpgrade) {
 				reason = 'false - already requested';

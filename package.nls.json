@@ -83,10 +83,10 @@
 		]
 	},
 	"github.copilot.viewsWelcome.switchToReleaseChannel": {
-		"message": "The Pre-Release version of the GitHub Copilot Chat extension is not currently supported in the stable version of VS Code. Please switch to the release version for GitHub Copilot Chat or try VS Code Insiders.\n\n[Switch to Release Version and Reload](command:runCommands?%7B%22commands%22%3A%5B%7B%22command%22%3A%22workbench.extensions.action.switchToRelease%22%2C%22args%22%3A%5B%22GitHub.copilot-chat%22%5D%7D%2C%22workbench.action.reloadWindow%22%5D%7D)\n\n[Switch to VS Code Insiders](https://aka.ms/vscode-insiders)",
+		"message": "The Pre-Release version of the GitHub Copilot Chat extension is not currently supported in the stable version of VS Code. Please switch to the release version for GitHub Copilot Chat or try VS Code Insiders.\n\n[Switch to Release Version and Reload](command:runCommands?%7B%22commands%22%3A%5B%7B%22command%22%3A%22workbench.extensions.action.switchToRelease%22%2C%22args%22%3A%5B%22GitHub.gunner%22%5D%7D%2C%22workbench.action.reloadWindow%22%5D%7D)\n\n[Switch to VS Code Insiders](https://aka.ms/vscode-insiders)",
 		"comment": [
 			"{Locked='['}",
-			"{Locked='](command:runCommands?%7B%22commands%22%3A%5B%7B%22command%22%3A%22workbench.extensions.action.switchToRelease%22%2C%22args%22%3A%5B%22GitHub.copilot-chat%22%5D%7D%2C%22workbench.action.reloadWindow%22%5D%7D)'}",
+			"{Locked='](command:runCommands?%7B%22commands%22%3A%5B%7B%22command%22%3A%22workbench.extensions.action.switchToRelease%22%2C%22args%22%3A%5B%22GitHub.gunner%22%5D%7D%2C%22workbench.action.reloadWindow%22%5D%7D)'}",
 			"{Locked='](https://aka.ms/vscode-insiders)'}"
 		]
 	},
@@ -410,6 +410,15 @@
 	"github.copilot.config.cli.sessionController.enabled": "Enable the new session controller API for Copilot CLI. Requires VS Code reload.",
 	"github.copilot.config.cli.sessionControllerForSessionsApp.enabled": "Enable the new session controller API for Sessions App. Requires VS Code reload.",
 	"github.copilot.config.cli.terminalLinks.enabled": "Enable advanced clickable file links in Copilot CLI terminals. Resolves relative paths against session state directories. Requires VS Code reload.",
+	"github.copilot.config.localModel.enabled": "Skip GitHub Copilot login and send chat requests to a configured OpenAI-compatible endpoint. Requires `github.copilot.chat.localModel.apiKey` and `github.copilot.chat.localModel.baseUrl`.",
+	"github.copilot.config.localModel.apiKey": "API key sent as `Authorization: Bearer` to the local OpenAI-compatible endpoint. Reload the window after changing this value.",
+	"github.copilot.config.localModel.baseUrl": "Base URL of the OpenAI-compatible API, for example `https://api.x.ai/v1` or `https://api.x.ai/v1/chat/completions`. Reload the window after changing this value.",
+	"github.copilot.config.localModel.model": "Model id sent in chat requests, for example `grok-code-fast-1` or `grok-4`.",
+	"github.copilot.config.localModel.name": "Optional display name shown in the model picker. Defaults to a humanized model id.",
+	"github.copilot.config.localModel.maxInputTokens": "Maximum prompt tokens for the local model. Use `0` to keep the built-in default for the model id.",
+	"github.copilot.config.localModel.maxOutputTokens": "Maximum output tokens for the local model. Use `0` to keep the built-in default for the model id.",
+	"github.copilot.config.localModel.toolCalling": "Whether the local model supports tool calling. Keep this enabled for Agent mode.",
+	"github.copilot.config.localModel.vision": "Whether the local model accepts image inputs.",
 	"github.copilot.config.backgroundAgent.enabled": "Enable the Copilot CLI. When disabled, the Copilot CLI will not be available in 'Continue In' context menus.",
 	"github.copilot.config.cloudAgent.enabled": "Enable the Cloud Agent. When disabled, the Cloud Agent will not be available in 'Continue In' context menus.",
 	"github.copilot.config.copilotMemory.enabled": "Enable agentic memory for GitHub Copilot. When enabled, Copilot can store repository-scoped facts about your codebase conventions, structure, and preferences remotely on GitHub, and recall them in future conversations to provide more contextually relevant assistance. [Learn more](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/copilot-memory).",

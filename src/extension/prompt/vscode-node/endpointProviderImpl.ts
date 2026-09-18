@@ -7,6 +7,7 @@ import { LanguageModelChat, type ChatRequest } from 'vscode';
 import { IAuthenticationService } from '../../../platform/authentication/common/authentication';
 import { IConfigurationService } from '../../../platform/configuration/common/configurationService';
 import { ChatEndpointFamily, EmbeddingsEndpointFamily, IChatModelInformation, ICompletionModelInformation, IEmbeddingModelInformation, IEndpointProvider } from '../../../platform/endpoint/common/endpointProvider';
+import { createLocalOpenAIChatModelInformation, getLocalOpenAIModelSettings, isLocalOpenAIModelConfigurationChange, resolveLocalOpenAIChatCompletionsUrl } from '../../../platform/endpoint/common/localOpenAIModel';
 import { AutoChatEndpoint } from '../../../platform/endpoint/node/autoChatEndpoint';
 import { IAutomodeService } from '../../../platform/endpoint/node/automodeService';
 import { CopilotChatEndpoint } from '../../../platform/endpoint/node/copilotChatEndpoint';
@@ -18,6 +19,7 @@ import { IChatEndpoint, IEmbeddingsEndpoint } from '../../../platform/networking
 import { Emitter, Event } from '../../../util/vs/base/common/event';
 import { Disposable } from '../../../util/vs/base/common/lifecycle';
 import { IInstantiationService } from '../../../util/vs/platform/instantiation/common/instantiation';
+import { OpenAIEndpoint } from '../../byok/node/openAIEndpoint';
 
 
 export class ProductionEndpointProvider extends Disposable implements IEndpointProvider {
@@ -50,6 +52,12 @@ export class ProductionEndpointProvider extends Disposable implements IEndpointP
 			this._embeddingEndpoints.clear();
 			this._onDidModelsRefresh.fire();
 		}));
+		this._register(this._configService.onDidChangeConfiguration(e => {
+			if (isLocalOpenAIModelConfigurationChange(e)) {
+				this._chatEndpoints.clear();
+				this._onDidModelsRefresh.fire();
+			}
+		}));
 	}
 
 	private getOrCreateChatEndpointInstance(modelMetadata: IChatModelInformation): IChatEndpoint {
@@ -62,8 +70,35 @@ export class ProductionEndpointProvider extends Disposable implements IEndpointP
 		return chatEndpoint;
 	}
 
+	private getLocalOpenAIChatEndpoint(): IChatEndpoint | undefined {
+		const settings = getLocalOpenAIModelSettings(this._configService);
+		if (!settings) {
+			return undefined;
+		}
+
+		const cacheKey = `local:${settings.model}:${settings.baseUrl}`;
+		let chatEndpoint = this._chatEndpoints.get(cacheKey);
+		if (!chatEndpoint) {
+			const modelMetadata = createLocalOpenAIChatModelInformation(settings);
+			chatEndpoint = this._instantiationService.createInstance(
+				OpenAIEndpoint,
+				modelMetadata,
+				settings.apiKey,
+				resolveLocalOpenAIChatCompletionsUrl(settings.baseUrl),
+			);
+			this._chatEndpoints.set(cacheKey, chatEndpoint);
+			this._logService.info(`Using local OpenAI-compatible model ${settings.model} at ${settings.baseUrl}`);
+		}
+		return chatEndpoint;
+	}
+
 	async getChatEndpoint(requestOrFamilyOrModel: LanguageModelChat | ChatRequest | ChatEndpointFamily): Promise<IChatEndpoint> {
 		this._logService.trace(`Resolving chat model`);
+
+		const localEndpoint = this.getLocalOpenAIChatEndpoint();
+		if (localEndpoint) {
+			return localEndpoint;
+		}
 
 		if (typeof requestOrFamilyOrModel === 'string') {
 			const modelMetadata = await this._modelFetcher.getChatModelFromFamily(requestOrFamilyOrModel);
@@ -117,6 +152,11 @@ export class ProductionEndpointProvider extends Disposable implements IEndpointP
 	}
 
 	async getAllChatEndpoints(): Promise<IChatEndpoint[]> {
+		const localEndpoint = this.getLocalOpenAIChatEndpoint();
+		if (localEndpoint) {
+			return [localEndpoint];
+		}
+
 		const models: IChatModelInformation[] = await this._modelFetcher.getAllChatModels();
 		return models.map(model => this.getOrCreateChatEndpointInstance(model));
 	}

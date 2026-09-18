@@ -215,7 +215,7 @@ export class LanguageModelAccess extends Disposable implements IExtensionContrib
 		};
 		this._register(vscode.lm.registerLanguageModelChatProvider('copilot', provider));
 		this._register(this._authenticationService.onDidAuthenticationChange(() => {
-			if (!this._authenticationService.anyGitHubSession) {
+			if (!this._authenticationService.anyGitHubSession && !this._authenticationService.copilotToken?.isLocalOpenAIModelUser) {
 				this._currentModels = [];
 			}
 			// Auth changed which means models could've changed. Fire the event
@@ -410,7 +410,8 @@ export class LanguageModelAccess extends Disposable implements IExtensionContrib
 
 		const update = async () => {
 
-			if (!await this._getToken()) {
+			const token = await this._getToken();
+			if (!token || token.isLocalOpenAIModelUser) {
 				dispo.clear();
 				return;
 			}

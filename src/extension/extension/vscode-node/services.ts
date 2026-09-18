@@ -9,7 +9,7 @@ import { ExtensionContext, ExtensionMode, env, workspace } from 'vscode';
 import { IAuthenticationService } from '../../../platform/authentication/common/authentication';
 import { ICopilotTokenManager } from '../../../platform/authentication/common/copilotTokenManager';
 import { StaticGitHubAuthenticationService } from '../../../platform/authentication/common/staticGitHubAuthenticationService';
-import { createStaticGitHubTokenProvider, getOrCreateTestingCopilotTokenManager } from '../../../platform/authentication/node/copilotTokenManager';
+import { createStaticGitHubTokenProvider, getOrCreateTestingCopilotTokenManager, LocalOpenAIModelCopilotTokenManager } from '../../../platform/authentication/node/copilotTokenManager';
 import { AuthenticationService } from '../../../platform/authentication/vscode-node/authenticationService';
 import { VSCodeCopilotTokenManager } from '../../../platform/authentication/vscode-node/copilotTokenManager';
 import { IChatAgentService } from '../../../platform/chat/common/chatAgents';
@@ -23,6 +23,7 @@ import { NodeHookExecutor } from '../../../platform/chat/node/hookExecutor';
 import { IChunkingEndpointClient } from '../../../platform/chunking/common/chunkingEndpointClient';
 import { ChunkingEndpointClientImpl } from '../../../platform/chunking/common/chunkingEndpointClientImpl';
 import { INaiveChunkingService, NaiveChunkingService } from '../../../platform/chunking/node/naiveChunkerService';
+import { ConfigKey } from '../../../platform/configuration/common/configurationService';
 import { IDevContainerConfigurationService } from '../../../platform/devcontainer/common/devContainerConfigurationService';
 import { IDiffService } from '../../../platform/diff/common/diffService';
 import { DiffServiceImpl } from '../../../platform/diff/node/diffServiceImpl';
@@ -191,7 +192,14 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 		builder.define(ICopilotTokenManager, getOrCreateTestingCopilotTokenManager(env.devDeviceId));
 	} else {
 		setupTelemetry(builder, extensionContext, internalAIKey, internalLargeEventAIKey, ariaKey);
-		builder.define(ICopilotTokenManager, new SyncDescriptor(VSCodeCopilotTokenManager));
+		const localModelEnabled = workspace.getConfiguration('github.copilot').get<boolean>(ConfigKey.LocalModelEnabled.id) === true;
+		const localModelApiKey = (workspace.getConfiguration('github.copilot').get<string>(ConfigKey.LocalModelApiKey.id) ?? '').trim();
+		const localModelBaseUrl = (workspace.getConfiguration('github.copilot').get<string>(ConfigKey.LocalModelBaseUrl.id) ?? '').trim();
+		if (localModelEnabled && localModelApiKey && localModelBaseUrl) {
+			builder.define(ICopilotTokenManager, new SyncDescriptor(LocalOpenAIModelCopilotTokenManager));
+		} else {
+			builder.define(ICopilotTokenManager, new SyncDescriptor(VSCodeCopilotTokenManager));
+		}
 	}
 
 	if (isScenarioAutomation) {

@@ -138,6 +138,10 @@ export class CopilotToken {
 		return this.sku === 'no_auth_limited_copilot';
 	}
 
+	get isLocalOpenAIModelUser(): boolean {
+		return this.sku === 'local_openai_model';
+	}
+
 	get isChatQuotaExceeded(): boolean {
 		return this.isFreeUser && (this._info.limited_user_quotas?.chat ?? 1) <= 0;
 	}
@@ -271,7 +275,8 @@ export interface NotificationEnvelope {
  */
 export type WellKnownSku =
 	| 'free_limited_copilot'
-	| 'no_auth_limited_copilot';
+	| 'no_auth_limited_copilot'
+	| 'local_openai_model';
 
 /**
  * User's access type/SKU from the Copilot token endpoint.
@@ -525,6 +530,21 @@ export type ExtendedTokenInfo = TokenEnvelope & {
  * Creates a minimal ExtendedTokenInfo for testing purposes.
  * All required TokenEnvelope fields are populated with sensible defaults.
  */
+export function createLocalOpenAIExtendedTokenInfo(overrides?: Partial<ExtendedTokenInfo>): ExtendedTokenInfo {
+	return createTestExtendedTokenInfo({
+		token: 'tid=local-openai-model;chat=1;rt=1;exp=4102444800:local',
+		expires_at: 4102444800,
+		refresh_in: 60 * 60 * 24 * 365,
+		sku: 'local_openai_model',
+		individual: true,
+		username: 'local-openai-model',
+		copilot_plan: 'individual',
+		telemetry: 'disabled',
+		public_suggestions: 'disabled',
+		...overrides,
+	});
+}
+
 export function createTestExtendedTokenInfo(overrides?: Partial<ExtendedTokenInfo>): ExtendedTokenInfo {
 	return {
 		// Required token envelope fields

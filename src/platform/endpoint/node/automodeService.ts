@@ -21,6 +21,7 @@ import { IRequestLogger } from '../../requestLogger/node/requestLogger';
 import { IExperimentationService } from '../../telemetry/common/nullExperimentationService';
 import { ITelemetryService } from '../../telemetry/common/telemetry';
 import { ICAPIClientService } from '../common/capiClient';
+import { isLocalOpenAIModelConfigured } from '../common/localOpenAIModel';
 import { AutoChatEndpoint } from './autoChatEndpoint';
 import { RouterDecisionFetcher, RoutingContextSignals } from './routerDecisionFetcher';
 
@@ -172,6 +173,10 @@ export class AutomodeService extends Disposable implements IAutomodeService {
 	async resolveAutoModeEndpoint(chatRequest: ChatRequest | undefined, knownEndpoints: IChatEndpoint[]): Promise<IChatEndpoint> {
 		if (!knownEndpoints.length) {
 			throw new Error('No auto mode endpoints provided.');
+		}
+
+		if (this._authService.copilotToken?.isLocalOpenAIModelUser || isLocalOpenAIModelConfigured(this._configurationService)) {
+			return knownEndpoints[0];
 		}
 
 		const conversationId = chatRequest?.sessionResource?.toString() ?? chatRequest?.sessionId ?? 'unknown';

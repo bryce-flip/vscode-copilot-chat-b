@@ -193,6 +193,29 @@ export abstract class BaseAuthenticationService extends Disposable implements IA
 		}));
 	}
 
+	protected async seedLocalOpenAIModelToken(): Promise<boolean> {
+		if (this._tokenStore.copilotToken?.isLocalOpenAIModelUser) {
+			return true;
+		}
+
+		if (!this._configurationService.getConfig(ConfigKey.LocalModelEnabled)) {
+			return false;
+		}
+
+		try {
+			const token = await this._tokenManager.getCopilotToken();
+			if (token.isLocalOpenAIModelUser) {
+				this._tokenStore.copilotToken = token;
+				this.fireAuthenticationChange('seedLocalOpenAIModelToken');
+				return true;
+			}
+		} catch {
+			// Fall through to the GitHub auth path.
+		}
+
+		return false;
+	}
+
 	//#region isMinimalMode
 
 	protected _isMinimalMode = derived(r => this._configurationService.getConfigObservable(ConfigKey.Shared.AuthPermissions).read(r) === AuthPermissionMode.Minimal);

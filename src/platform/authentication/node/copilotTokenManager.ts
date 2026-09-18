@@ -17,7 +17,7 @@ import { ILogService } from '../../log/common/logService';
 import { FetchOptions, IFetcherService, Response, jsonVerboseError } from '../../networking/common/fetcherService';
 import { ITelemetryService } from '../../telemetry/common/telemetry';
 import { TelemetryData } from '../../telemetry/common/telemetryData';
-import { CopilotToken, CopilotUserInfo, ErrorEnvelope, ExtendedTokenInfo, StandardErrorEnvelope, TokenEnvelope, TokenInfoOrError, TokenValidationResult, containsVSCodeOrg, createTestExtendedTokenInfo, isErrorEnvelope, isStandardErrorEnvelope, validateTokenEnvelope } from '../common/copilotToken';
+import { CopilotToken, CopilotUserInfo, ErrorEnvelope, ExtendedTokenInfo, StandardErrorEnvelope, TokenEnvelope, TokenInfoOrError, TokenValidationResult, containsVSCodeOrg, createLocalOpenAIExtendedTokenInfo, createTestExtendedTokenInfo, isErrorEnvelope, isStandardErrorEnvelope, validateTokenEnvelope } from '../common/copilotToken';
 import { CheckCopilotToken, ICopilotTokenManager, NotGitHubLoginFailed, nowSeconds } from '../common/copilotTokenManager';
 
 /**
@@ -394,6 +394,39 @@ export class FixedCopilotTokenManager extends BaseCopilotTokenManager implements
 
 	async checkCopilotToken(): Promise<{ status: 'OK' }> {
 		// assume it's valid
+		return { status: 'OK' };
+	}
+}
+
+//#endregion
+
+//#region LocalOpenAIModelCopilotTokenManager
+
+/**
+ * A token manager that never talks to GitHub. Used when the user configured a
+ * local OpenAI-compatible model (`github.copilot.chat.localModel.*`).
+ */
+export class LocalOpenAIModelCopilotTokenManager extends BaseCopilotTokenManager implements CheckCopilotToken {
+	constructor(
+		@ILogService logService: ILogService,
+		@ITelemetryService telemetryService: ITelemetryService,
+		@ICAPIClientService capiClientService: ICAPIClientService,
+		@IDomainService domainService: IDomainService,
+		@IFetcherService fetcherService: IFetcherService,
+		@IEnvService envService: IEnvService
+	) {
+		super(new NullBaseOctoKitService(capiClientService, fetcherService, logService, telemetryService), logService, telemetryService, domainService, capiClientService, fetcherService, envService);
+		this.copilotToken = createLocalOpenAIExtendedTokenInfo();
+	}
+
+	async getCopilotToken(): Promise<CopilotToken> {
+		if (!this.copilotToken) {
+			this.copilotToken = createLocalOpenAIExtendedTokenInfo();
+		}
+		return new CopilotToken(this.copilotToken);
+	}
+
+	async checkCopilotToken(): Promise<{ status: 'OK' }> {
 		return { status: 'OK' };
 	}
 }

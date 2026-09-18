@@ -17,8 +17,8 @@ import { FetchOptions, IAbortController, IFetcherService, PaginationOptions, Res
 import { ITelemetryService } from '../../../telemetry/common/telemetry';
 import { createFakeResponse } from '../../../test/node/fetcher';
 import { createPlatformServices, ITestingServicesAccessor } from '../../../test/node/services';
-import { CopilotToken, createTestExtendedTokenInfo, isErrorEnvelope, isStandardErrorEnvelope, isTokenEnvelope, validateTokenEnvelope } from '../../common/copilotToken';
-import { BaseCopilotTokenManager, CopilotTokenManagerFromGitHubToken } from '../../node/copilotTokenManager';
+import { CopilotToken, createLocalOpenAIExtendedTokenInfo, createTestExtendedTokenInfo, isErrorEnvelope, isStandardErrorEnvelope, isTokenEnvelope, validateTokenEnvelope } from '../../common/copilotToken';
+import { BaseCopilotTokenManager, CopilotTokenManagerFromGitHubToken, LocalOpenAIModelCopilotTokenManager } from '../../node/copilotTokenManager';
 
 // This is a fake version of CopilotTokenManagerFromGitHubToken.
 class RefreshFakeCopilotTokenManager extends BaseCopilotTokenManager {
@@ -245,6 +245,13 @@ describe('Copilot token unit tests', function () {
 			kind: 'failure',
 			reason: 'HTTP401',
 		});
+	});
+
+	it('LocalOpenAIModelCopilotTokenManager never talks to GitHub', async function () {
+		const tokenManager = accessor.get(IInstantiationService).createInstance(LocalOpenAIModelCopilotTokenManager);
+		const token = await tokenManager.getCopilotToken();
+		expect(token.isLocalOpenAIModelUser).toBe(true);
+		expect(await tokenManager.checkCopilotToken()).toEqual({ status: 'OK' });
 	});
 });
 
@@ -501,6 +508,15 @@ describe('CopilotToken class', function () {
 		const token = new CopilotToken(createTestExtendedTokenInfo({ sku: 'no_auth_limited_copilot' }));
 		expect(token.isFreeUser).toBe(false);
 		expect(token.isNoAuthUser).toBe(true);
+	});
+
+	it('isLocalOpenAIModelUser returns true for local_openai_model sku', function () {
+		const token = new CopilotToken(createLocalOpenAIExtendedTokenInfo());
+		expect(token.isLocalOpenAIModelUser).toBe(true);
+		expect(token.isFreeUser).toBe(false);
+		expect(token.isNoAuthUser).toBe(false);
+		expect(token.isIndividual).toBe(true);
+		expect(token.getTokenValue('chat')).toBe('1');
 	});
 
 	it('isTelemetryEnabled reflects token state', function () {

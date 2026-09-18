@@ -17,7 +17,7 @@ import { GHPR_EXTENSION_ID } from '../../chatSessions/vscode/chatSessionsUriHand
 import { EXTENSION_ID } from '../../common/constants';
 
 const welcomeViewContextKeys = {
-	Activated: 'github.copilot-chat.activated',
+	Activated: 'github.gunner.activated',
 	Offline: 'github.copilot.offline',
 	IndividualDisabled: 'github.copilot.interactiveSession.individual.disabled',
 	IndividualExpired: 'github.copilot.interactiveSession.individual.expired',

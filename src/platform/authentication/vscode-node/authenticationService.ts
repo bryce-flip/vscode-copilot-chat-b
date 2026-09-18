@@ -37,7 +37,14 @@ export class AuthenticationService extends BaseAuthenticationService {
 			}
 		}));
 
-		void this._handleAuthChangeEvent();
+		void this._initialize();
+	}
+
+	private async _initialize(): Promise<void> {
+		if (await this.seedLocalOpenAIModelToken()) {
+			return;
+		}
+		await this._handleAuthChangeEvent();
 	}
 
 	override async getGitHubSession(kind: 'permissive' | 'any', options: AuthenticationGetSessionOptions & { createIfNone: StrictAuthenticationPresentationOptions }): Promise<AuthenticationSession>;

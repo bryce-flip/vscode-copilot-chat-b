@@ -159,6 +159,10 @@ export function isBYOKEnabled(copilotToken: Omit<CopilotToken, 'token'>, capiCli
 		return true;
 	}
 
+	if (copilotToken.isLocalOpenAIModelUser) {
+		return false;
+	}
+
 	const isGHE = capiClientService.dotcomAPIURL !== 'https://api.github.com';
 	const byokAllowed = (copilotToken.isInternal || copilotToken.isIndividual) && !isGHE;
 	return byokAllowed;

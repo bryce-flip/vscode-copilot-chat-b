@@ -116,8 +116,8 @@ class TestEnvService {
 class TestExtensionContext {
 	declare readonly _serviceBrand: undefined;
 	globalStorageUri = { fsPath: '/tmp/test-global-storage' };
-	extension = { id: 'GitHub.copilot-chat' };
-	extensionUri = { fsPath: '/tmp/extensions/copilot-chat' };
+	extension = { id: 'GitHub.gunner' };
+	extensionUri = { fsPath: '/tmp/extensions/gunner' };
 	extensionMode = 3; // ExtensionMode.Test
 }
 
