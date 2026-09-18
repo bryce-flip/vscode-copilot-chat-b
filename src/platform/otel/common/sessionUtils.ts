@@ -10,13 +10,13 @@ import type { Uri } from 'vscode';
  *
  * Handles multiple URI schemes:
  * - `vscode-chat-session://local/<base64EncodedSessionId>` — foreground chat sessions
- * - `copilotcli://<sessionId>` — CLI in-process sessions
+ * - `gunnercli://<sessionId>` — CLI in-process sessions
  * - `claude-code://<sessionId>` — Claude Code sessions
  *
  * Used by the debug panel, span export, and other session-aware features.
  */
 export function decodeSessionId(sessionResource: Uri): string {
-	if (sessionResource.scheme === 'copilotcli' || sessionResource.scheme === 'claude-code') {
+	if (sessionResource.scheme === 'gunnercli' || sessionResource.scheme === 'claude-code') {
 		return sessionResource.path.replace(/^\//, '');
 	}
 	const pathSegment = sessionResource.path.replace(/^\//, '').split('/').pop() || '';

@@ -16,6 +16,28 @@ const isDev = process.argv.includes('--dev');
 const isPreRelease = process.argv.includes('--prerelease');
 const generateSourceMaps = process.argv.includes('--sourcemaps');
 const sourceMapOutDir = './dist-sourcemaps';
+const distDir = './dist';
+
+const runtimeAssetPaths = [
+	'node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-c-sharp.wasm',
+	'node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-cpp.wasm',
+	'node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-go.wasm',
+	'node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-javascript.wasm',
+	'node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-python.wasm',
+	'node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-ruby.wasm',
+	'node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-typescript.wasm',
+	'node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-tsx.wasm',
+	'node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-java.wasm',
+	'node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-rust.wasm',
+	'node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-php.wasm',
+	'node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter.wasm',
+	'node_modules/@github/blackbird-external-ingest-utils/pkg/nodejs/external_ingest_utils_bg.wasm',
+];
+
+const vendoredTiktokenFiles = [
+	'src/platform/tokenizer/node/cl100k_base.tiktoken',
+	'src/platform/tokenizer/node/o200k_base.tiktoken',
+];
 
 const baseBuildOptions = {
 	bundle: true,
@@ -267,6 +289,65 @@ async function typeScriptServerPluginPackageJsonInstall(): Promise<void> {
 	}
 }
 
+async function copyRuntimeAssetsToDist(): Promise<void> {
+	await Promise.all([
+		...runtimeAssetPaths.map(copyRuntimeAssetToDist),
+		...vendoredTiktokenFiles.map(compressTikTokenToDist),
+	]);
+}
+
+async function copyRuntimeAssetToDist(sourcePath: string): Promise<void> {
+	const source = path.join(REPO_ROOT, sourcePath);
+	const destination = path.join(REPO_ROOT, distDir, path.basename(sourcePath));
+	await mkdir(path.dirname(destination), { recursive: true });
+	await copyFile(source, destination);
+}
+
+async function compressTikTokenToDist(sourcePath: string): Promise<void> {
+	const source = path.join(REPO_ROOT, sourcePath);
+	const destination = path.join(REPO_ROOT, distDir, path.basename(sourcePath));
+	const raw = await fs.promises.readFile(source, 'utf-8');
+	const chunks: Buffer[] = [];
+
+	let index = 0;
+	for (const line of raw.split('\n')) {
+		if (!line) {
+			continue;
+		}
+
+		const [base64, indexString] = line.split(' ');
+		const lineIndex = Number(indexString);
+		if (lineIndex !== index) {
+			throw new Error(`Malformed tiktoken file ${sourcePath}: expected index ${index}, got ${indexString}`);
+		}
+
+		const term = Buffer.from(base64, 'base64');
+		chunks.push(writeVariableLengthQuantity(term.length), term);
+		index++;
+	}
+
+	await mkdir(path.dirname(destination), { recursive: true });
+	await fs.promises.writeFile(destination, Buffer.concat(chunks));
+}
+
+function writeVariableLengthQuantity(i: number): Buffer {
+	if (i !== (i | 0)) {
+		throw new Error(`${i} is not an int32.`);
+	}
+
+	const result: number[] = [];
+	do {
+		let byte = i & 0x7f;
+		i >>>= 7;
+		if (i !== 0) {
+			byte |= 0x80;
+		}
+		result.push(byte);
+	} while (i !== 0);
+
+	return Buffer.from(result);
+}
+
 const typeScriptServerPluginBuildOptions = {
 	bundle: true,
 	format: 'cjs',
@@ -369,6 +450,7 @@ async function main() {
 						console.error('[watch]', error);
 					}
 				}
+				await copyRuntimeAssetsToDist();
 				console.log('[watch] build finished');
 			}, 100);
 		};
@@ -408,6 +490,7 @@ async function main() {
 			esbuild.build(typeScriptServerPluginBuildOptions),
 			esbuild.build(webviewBuildOptions),
 		]);
+		await copyRuntimeAssetsToDist();
 
 		// Move source maps to separate directory so they're not packaged with the extension
 		await moveSourceMapsToSeparateDir();

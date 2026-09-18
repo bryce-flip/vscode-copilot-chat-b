@@ -27,8 +27,8 @@ vi.mock('../../copilotcli/node/cliHelpers', async (importOriginal) => {
 	};
 });
 
-const WORKSPACE_FOLDER_MEMENTO_KEY = 'github.copilot.cli.sessionWorkspaceFolders';
-const WORKTREE_MEMENTO_KEY = 'github.copilot.cli.sessionWorktrees';
+const WORKSPACE_FOLDER_MEMENTO_KEY = 'gunner.cli.sessionWorkspaceFolders';
+const WORKTREE_MEMENTO_KEY = 'gunner.cli.sessionWorktrees';
 
 class MockGlobalState implements vscode.Memento {
 	private data = new Map<string, unknown>();
@@ -82,7 +82,7 @@ class MockLogService extends mock<ILogService>() {
 }
 
 // Paths used by the store
-const GLOBAL_STORAGE_DIR = Uri.joinPath(Uri.file('/mock/global/storage'), 'copilotcli');
+const GLOBAL_STORAGE_DIR = Uri.joinPath(Uri.file('/mock/global/storage'), 'gunnercli');
 const BULK_METADATA_FILE = Uri.joinPath(GLOBAL_STORAGE_DIR, 'copilotcli.session.metadata.json');
 
 function sessionDirectoryUri(sessionId: string): Uri {

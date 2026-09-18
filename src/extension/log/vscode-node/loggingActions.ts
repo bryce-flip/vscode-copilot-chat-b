@@ -84,9 +84,9 @@ export class LoggingActionsContrib {
 
 User Settings:
 \`\`\`json${getNetworkSettings()}
-  "github.copilot.advanced.debug.useElectronFetcher": ${electronConfig},
-  "github.copilot.advanced.debug.useNodeFetcher": ${nodeConfig},
-  "github.copilot.advanced.debug.useNodeFetchFetcher": ${nodeFetchConfig}
+  "gunner.advanced.debug.useElectronFetcher": ${electronConfig},
+  "gunner.advanced.debug.useNodeFetcher": ${nodeConfig},
+  "gunner.advanced.debug.useNodeFetchFetcher": ${nodeFetchConfig}
 \`\`\`${getProxyEnvVariables()}
 `);
 			const proxyAgent = loadVSCodeModule<ProxyAgent>('@vscode/proxy-agent');
@@ -246,11 +246,11 @@ In corporate networks: [Troubleshooting firewall settings for GitHub Copilot](ht
 
 			return document.getText();
 		};
-		this._context.subscriptions.push(vscode.commands.registerCommand('github.copilot.debug.collectDiagnostics', collectDiagnostics));
+		this._context.subscriptions.push(vscode.commands.registerCommand('gunner.debug.collectDiagnostics', collectDiagnostics));
 		// Internal command is not declared in package.json so it can be used from the welcome views while the extension is being activated.
-		this._context.subscriptions.push(vscode.commands.registerCommand('github.copilot.debug.collectDiagnostics.internal', collectDiagnostics));
-		this._context.subscriptions.push(vscode.commands.registerCommand('github.copilot.debug.showOutputChannel.internal', () => outputChannel.show()));
-		this._context.subscriptions.push(vscode.commands.registerCommand('github.copilot.debug.showNodeSystemCertificatesErrors', async () => {
+		this._context.subscriptions.push(vscode.commands.registerCommand('gunner.debug.collectDiagnostics.internal', collectDiagnostics));
+		this._context.subscriptions.push(vscode.commands.registerCommand('gunner.debug.showOutputChannel.internal', () => outputChannel.show()));
+		this._context.subscriptions.push(vscode.commands.registerCommand('gunner.debug.showNodeSystemCertificatesErrors', async () => {
 			const result: Record<string, unknown> = {};
 			try {
 				const certs = tls.getCACertificates('system');

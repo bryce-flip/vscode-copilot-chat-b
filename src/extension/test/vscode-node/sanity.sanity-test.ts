@@ -172,7 +172,7 @@ suite('Copilot Chat Sanity Test', function () {
 			const conversationFeature = instaService.createInstance(ConversationFeature);
 			try {
 				conversationFeature.activated = true;
-				const provider = sessionItemProviders.get('copilotcli');
+				const provider = sessionItemProviders.get('gunnercli');
 				assert.ok(provider);
 				await provider.provideChatSessionItems(CancellationToken.None);
 			} finally {

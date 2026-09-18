@@ -24,8 +24,8 @@ import { IExtensionContribution } from '../../common/contributions';
 import { assembleChatLogExport, createExportedPrompt, ExportedPrompt, serializeChatLogExport } from '../node/chatLogExport';
 
 const showHtmlCommand = 'vscode.copilot.chat.showRequestHtmlItem';
-const exportLogItemCommand = 'github.copilot.chat.debug.exportLogItem';
-const exportPromptArchiveCommand = 'github.copilot.chat.debug.exportPromptArchive';
+const exportLogItemCommand = 'gunner.chat.debug.exportLogItem';
+const exportPromptArchiveCommand = 'gunner.chat.debug.exportPromptArchive';
 
 /**
  * Serialize MCP server definitions to a JSON-safe format.
@@ -52,10 +52,10 @@ function serializeMcpServers(servers: readonly vscode.McpServerDefinition[]): ob
 		}
 	});
 }
-const exportPromptLogsAsJsonCommand = 'github.copilot.chat.debug.exportPromptLogsAsJson';
-const exportAllPromptLogsAsJsonCommand = 'github.copilot.chat.debug.exportAllPromptLogsAsJson';
-const saveCurrentMarkdownCommand = 'github.copilot.chat.debug.saveCurrentMarkdown';
-const showRawRequestBodyCommand = 'github.copilot.chat.debug.showRawRequestBody';
+const exportPromptLogsAsJsonCommand = 'gunner.chat.debug.exportPromptLogsAsJson';
+const exportAllPromptLogsAsJsonCommand = 'gunner.chat.debug.exportAllPromptLogsAsJson';
+const saveCurrentMarkdownCommand = 'gunner.chat.debug.saveCurrentMarkdown';
+const showRawRequestBodyCommand = 'gunner.chat.debug.showRawRequestBody';
 
 export class RequestLogTree extends Disposable implements IExtensionContribution {
 	readonly id = 'requestLogTree';
@@ -67,7 +67,7 @@ export class RequestLogTree extends Disposable implements IExtensionContribution
 	) {
 		super();
 		this.chatRequestProvider = this._register(instantiationService.createInstance(ChatRequestProvider));
-		this._register(vscode.window.registerTreeDataProvider('copilot-chat', this.chatRequestProvider));
+		this._register(vscode.window.registerTreeDataProvider('gunner', this.chatRequestProvider));
 
 		let server: RequestServer | undefined;
 
@@ -509,7 +509,7 @@ export class RequestLogTree extends Disposable implements IExtensionContribution
 			await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(ChatRequestScheme.buildUri({ kind: 'request', id: requestId }, 'rawrequest')));
 		}));
 
-		this._register(vscode.commands.registerCommand('github.copilot.debug.showOutputChannel', async () => {
+		this._register(vscode.commands.registerCommand('gunner.debug.showOutputChannel', async () => {
 			outputChannel.show();
 		}));
 	}
@@ -831,7 +831,7 @@ class LogTreeFilters extends Disposable {
 	}
 
 	private getStorageKey(name: string): string {
-		return `github.copilot.chat.debug.${name}Hidden`;
+		return `gunner.chat.debug.${name}Hidden`;
 	}
 
 	setElementsShown(value: boolean) {
@@ -904,7 +904,7 @@ class LogTreeFilters extends Disposable {
 	}
 
 	private setShown(name: string, value: boolean): void {
-		vscode.commands.executeCommand('setContext', `github.copilot.chat.debug.${name}Hidden`, !value);
+		vscode.commands.executeCommand('setContext', `gunner.chat.debug.${name}Hidden`, !value);
 		this.vscodeExtensionContext.workspaceState.update(this.getStorageKey(name), !value);
 		this._onDidChangeFilters.fire();
 	}
@@ -914,13 +914,13 @@ class LogTreeFilterCommands extends Disposable {
 	constructor(filters: LogTreeFilters) {
 		super();
 
-		this._register(vscode.commands.registerCommand('github.copilot.chat.debug.showElements', () => filters.setElementsShown(true)));
-		this._register(vscode.commands.registerCommand('github.copilot.chat.debug.hideElements', () => filters.setElementsShown(false)));
-		this._register(vscode.commands.registerCommand('github.copilot.chat.debug.showTools', () => filters.setToolsShown(true)));
-		this._register(vscode.commands.registerCommand('github.copilot.chat.debug.hideTools', () => filters.setToolsShown(false)));
-		this._register(vscode.commands.registerCommand('github.copilot.chat.debug.showNesRequests', () => filters.setNesRequestsShown(true)));
-		this._register(vscode.commands.registerCommand('github.copilot.chat.debug.hideNesRequests', () => filters.setNesRequestsShown(false)));
-		this._register(vscode.commands.registerCommand('github.copilot.chat.debug.showGhostRequests', () => filters.setGhostRequestsShown(true)));
-		this._register(vscode.commands.registerCommand('github.copilot.chat.debug.hideGhostRequests', () => filters.setGhostRequestsShown(false)));
+		this._register(vscode.commands.registerCommand('gunner.chat.debug.showElements', () => filters.setElementsShown(true)));
+		this._register(vscode.commands.registerCommand('gunner.chat.debug.hideElements', () => filters.setElementsShown(false)));
+		this._register(vscode.commands.registerCommand('gunner.chat.debug.showTools', () => filters.setToolsShown(true)));
+		this._register(vscode.commands.registerCommand('gunner.chat.debug.hideTools', () => filters.setToolsShown(false)));
+		this._register(vscode.commands.registerCommand('gunner.chat.debug.showNesRequests', () => filters.setNesRequestsShown(true)));
+		this._register(vscode.commands.registerCommand('gunner.chat.debug.hideNesRequests', () => filters.setNesRequestsShown(false)));
+		this._register(vscode.commands.registerCommand('gunner.chat.debug.showGhostRequests', () => filters.setGhostRequestsShown(true)));
+		this._register(vscode.commands.registerCommand('gunner.chat.debug.hideGhostRequests', () => filters.setGhostRequestsShown(false)));
 	}
 }

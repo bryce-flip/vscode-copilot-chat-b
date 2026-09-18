@@ -4,10 +4,11 @@
 		{
 			"type": "extensionHost",
 			"request": "launch",
-			"name": "Launch Copilot Extension",
+			"name": "Launch Gunner Extension",
 			"runtimeExecutable": "${execPath}",
 			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}"
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--enable-proposed-api=GitHub.gunner"
 			],
 			"smartStep": true,
 			"sourceMaps": true,
@@ -27,10 +28,11 @@
 		{
 			"type": "extensionHost",
 			"request": "launch",
-			"name": "Launch Copilot Extension - Watch Mode",
+			"name": "Launch Gunner Extension - Watch Mode",
 			"runtimeExecutable": "${execPath}",
 			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}"
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--enable-proposed-api=GitHub.gunner"
 			],
 			"smartStep": true,
 			"sourceMaps": true,
@@ -50,7 +52,7 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Launch Copilot Extension - Watch Mode - Code OSS",
+			"name": "Launch Gunner Extension - Watch Mode - Code OSS",
 			"runtimeExecutable": "${workspaceFolder}/../vscode/scripts/code.sh",
 			"windows": {
 				"runtimeExecutable": "${workspaceFolder}/../vscode/scripts/code.bat",
@@ -58,6 +60,7 @@
 			"attachSimplePort": 5870,
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--enable-proposed-api=GitHub.gunner"
 			],
 			"smartStep": true,
 			"sourceMaps": true,
@@ -77,7 +80,7 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Launch Copilot Extension - Watch Mode - Agents OSS",
+			"name": "Launch Gunner Extension - Watch Mode - Agents OSS",
 			"runtimeExecutable": "${workspaceFolder}/../vscode/scripts/code.sh",
 			"windows": {
 				"runtimeExecutable": "${workspaceFolder}/../vscode/scripts/code.bat",
@@ -88,6 +91,7 @@
 			"attachSimplePort": 5870,
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--enable-proposed-api=GitHub.gunner"
 			],
 			"smartStep": true,
 			"sourceMaps": true,
@@ -131,6 +135,9 @@
 			"type": "extensionHost",
 			"request": "launch",
 			"testConfiguration": "${workspaceFolder}/.vscode-test.mjs",
+			"args": [
+				"--enable-proposed-api=GitHub.gunner"
+			],
 			"sourceMaps": true,
 			"smartStep": true,
 			"envFile": "${workspaceFolder}/.env",
@@ -294,10 +301,11 @@
 		{
 			"type": "extensionHost",
 			"request": "launch",
-			"name": "Launch Copilot Extension - TS Server in Debug Mode",
+			"name": "Launch Gunner Extension - TS Server in Debug Mode",
 			"runtimeExecutable": "${execPath}",
 			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}"
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--enable-proposed-api=GitHub.gunner"
 			],
 			"smartStep": true,
 			"sourceMaps": true,

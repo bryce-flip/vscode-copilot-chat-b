@@ -10,36 +10,36 @@
 // - These IDs should be used in package.json
 // - These IDs should only be registered if they appear in the package.json (meaning the command palette) or if the command needs to be supported when both extensions are loaded/active.
 
-export const CMDOpenPanelClient = 'github.copilot.generate';
-export const CMDOpenPanelChat = 'github.copilot.chat.openSuggestionsPanel'; // "github.copilot.chat.generate" is already being used
+export const CMDOpenPanelClient = 'gunner.generate';
+export const CMDOpenPanelChat = 'gunner.chat.openSuggestionsPanel'; // "gunner.chat.generate" is already being used
 
-export const CMDAcceptCursorPanelSolutionClient = 'github.copilot.acceptCursorPanelSolution';
-export const CMDNavigatePreviousPanelSolutionClient = 'github.copilot.previousPanelSolution';
-export const CMDNavigateNextPanelSolutionClient = 'github.copilot.nextPanelSolution';
+export const CMDAcceptCursorPanelSolutionClient = 'gunner.acceptCursorPanelSolution';
+export const CMDNavigatePreviousPanelSolutionClient = 'gunner.previousPanelSolution';
+export const CMDNavigateNextPanelSolutionClient = 'gunner.nextPanelSolution';
 
-export const CMDToggleStatusMenuClient = 'github.copilot.toggleStatusMenu';
-export const CMDToggleStatusMenuChat = 'github.copilot.chat.toggleStatusMenu';
+export const CMDToggleStatusMenuClient = 'gunner.toggleStatusMenu';
+export const CMDToggleStatusMenuChat = 'gunner.chat.toggleStatusMenu';
 
 // Needs to be supported in both extensions when they are loaded/active. Requires a different ID.
-export const CMDSendCompletionsFeedbackChat = 'github.copilot.chat.sendCompletionFeedback';
+export const CMDSendCompletionsFeedbackChat = 'gunner.chat.sendCompletionFeedback';
 
-export const CMDEnableCompletionsChat = 'github.copilot.chat.completions.enable';
-export const CMDDisableCompletionsChat = 'github.copilot.chat.completions.disable';
-export const CMDToggleCompletionsChat = 'github.copilot.chat.completions.toggle';
-export const CMDEnableCompletionsClient = 'github.copilot.completions.enable';
-export const CMDDisableCompletionsClient = 'github.copilot.completions.disable';
-export const CMDToggleCompletionsClient = 'github.copilot.completions.toggle';
+export const CMDEnableCompletionsChat = 'gunner.chat.completions.enable';
+export const CMDDisableCompletionsChat = 'gunner.chat.completions.disable';
+export const CMDToggleCompletionsChat = 'gunner.chat.completions.toggle';
+export const CMDEnableCompletionsClient = 'gunner.completions.enable';
+export const CMDDisableCompletionsClient = 'gunner.completions.disable';
+export const CMDToggleCompletionsClient = 'gunner.completions.toggle';
 
-export const CMDOpenLogsClient = 'github.copilot.openLogs';
-export const CMDOpenDocumentationClient = 'github.copilot.openDocs';
+export const CMDOpenLogsClient = 'gunner.openLogs';
+export const CMDOpenDocumentationClient = 'gunner.openDocs';
 
 // Existing chat command reused for diagnostics
-export const CMDCollectDiagnosticsChat = 'github.copilot.debug.collectDiagnostics';
+export const CMDCollectDiagnosticsChat = 'gunner.debug.collectDiagnostics';
 
 // Context variable that enable/disable panel-specific commands
-export const CopilotPanelVisible = 'github.copilot.panelVisible';
-export const ComparisonPanelVisible = 'github.copilot.comparisonPanelVisible';
-export const HasMultipleCompletionModels = 'github.copilot.completions.hasMultipleModels';
+export const CopilotPanelVisible = 'gunner.panelVisible';
+export const ComparisonPanelVisible = 'gunner.comparisonPanelVisible';
+export const HasMultipleCompletionModels = 'gunner.completions.hasMultipleModels';
 
-export const CMDOpenModelPickerClient = 'github.copilot.openModelPicker';
-export const CMDOpenModelPickerChat = 'github.copilot.chat.openModelPicker';
+export const CMDOpenModelPickerClient = 'gunner.openModelPicker';
+export const CMDOpenModelPickerChat = 'gunner.chat.openModelPicker';

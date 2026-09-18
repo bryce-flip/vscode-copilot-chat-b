@@ -99,7 +99,7 @@ export function wrapInResourceSpans(
 				})),
 			},
 			scopeSpans: [{
-				scope: { name: 'copilot-chat' },
+				scope: { name: 'gunner' },
 				spans: spans.map(completedSpanToOtlpSpan),
 			}],
 		}],

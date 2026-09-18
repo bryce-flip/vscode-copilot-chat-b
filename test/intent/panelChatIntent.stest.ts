@@ -28,7 +28,7 @@ function runAdditionalCases(sourceFile: string) {
 						location: ChatLocation.Panel,
 						name: (strictMode ? '[strict] ' : '[relaxed] ') + `[${expectedIntent === 'github' ? 'github' : 'builtin'}] ` + query,
 						query,
-						expectedIntent: (['workspace', 'vscode', 'new', 'newNotebook', 'unknown', 'tests', 'setupTests', 'terminalExplain', 'github.copilot-dynamic.platform'].includes(expectedIntent)
+						expectedIntent: (['workspace', 'vscode', 'new', 'newNotebook', 'unknown', 'tests', 'setupTests', 'terminalExplain', 'gunner-dynamic.platform'].includes(expectedIntent)
 							? (strictMode ? expectedIntent : [expectedIntent, 'unknown'])
 							: 'unknown'),
 					});

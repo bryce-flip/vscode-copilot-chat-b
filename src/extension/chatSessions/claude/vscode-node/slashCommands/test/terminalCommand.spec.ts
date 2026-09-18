@@ -117,7 +117,7 @@ describe('TerminalSlashCommand', () => {
 		});
 
 		it('has correct command ID', () => {
-			expect(terminalCommand.commandId).toBe('copilot.claude.terminal');
+			expect(terminalCommand.commandId).toBe('gunner.claude.terminal');
 		});
 	});
 

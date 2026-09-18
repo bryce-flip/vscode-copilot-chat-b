@@ -40,7 +40,7 @@ const execFileAsync = promisify(execFile);
 export class TerminalSlashCommand implements IClaudeSlashCommandHandler {
 	readonly commandName = 'terminal';
 	readonly description = vscode.l10n.t('Launch Claude Code CLI using your GitHub Copilot subscription');
-	readonly commandId = 'copilot.claude.terminal';
+	readonly commandId = 'gunner.claude.terminal';
 
 	private _langModelServer: ClaudeLanguageModelServer | undefined;
 

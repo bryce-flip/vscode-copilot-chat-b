@@ -26,10 +26,10 @@ import { getCopilotLogger } from './logger';
 import { ensureNodePtyShim } from './nodePtyShim';
 import { ensureRipgrepShim } from './ripgrepShim';
 
-const COPILOT_CLI_MODEL_MEMENTO_KEY = 'github.copilot.cli.sessionModel';
-const COPILOT_CLI_REQUEST_MAP_KEY = 'github.copilot.cli.requestMap';
+const COPILOT_CLI_MODEL_MEMENTO_KEY = 'gunner.cli.sessionModel';
+const COPILOT_CLI_REQUEST_MAP_KEY = 'gunner.cli.requestMap';
 // Store last used Agent for a Session.
-const COPILOT_CLI_SESSION_AGENTS_MEMENTO_KEY = 'github.copilot.cli.sessionAgents';
+const COPILOT_CLI_SESSION_AGENTS_MEMENTO_KEY = 'gunner.cli.sessionAgents';
 /**
  * @deprecated Use empty strings to represent default model/agent instead.
  * Left here for backward compatibility (for state stored by older versions of Chat extension).
@@ -145,7 +145,7 @@ export class CopilotCLIModels extends Disposable implements ICopilotCLIModels {
 				return 0;
 			}
 		};
-		this._register(lm.registerLanguageModelChatProvider('copilotcli', provider));
+		this._register(lm.registerLanguageModelChatProvider('gunnercli', provider));
 
 		void this._availableModels.value.then(() => this._onDidChange.fire());
 	}
@@ -168,7 +168,7 @@ export class CopilotCLIModels extends Disposable implements ICopilotCLIModels {
 					imageInput: model.supportsVision,
 					toolCalling: true
 				},
-				targetChatSessionType: 'copilotcli',
+				targetChatSessionType: 'gunnercli',
 				isDefault: index === 0 // SDK guarantees the first item is the default model
 			};
 		});
@@ -285,7 +285,7 @@ export class CopilotCLIAgents extends Disposable implements ICopilotCLIAgents {
 		for (const agent of await this.getSDKAgents()) {
 			merged.set(agent.name.toLowerCase(), {
 				agent: this.cloneAgent(agent),
-				sourceUri: URI.from({ scheme: 'copilotcli', path: `/agents/${agent.name}` }),
+				sourceUri: URI.from({ scheme: 'gunnercli', path: `/agents/${agent.name}` }),
 			});
 		}
 		for (const promptFile of this.chatPromptFileService.customAgentPromptFiles) {

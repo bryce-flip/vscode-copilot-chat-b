@@ -43,7 +43,7 @@ function makeSweAgent(name: string, description = '', displayName?: string): Rea
 function makeAgentInfo(name: string, description = '', displayName?: string): CLIAgentInfo {
 	return {
 		agent: makeSweAgent(name, description, displayName),
-		sourceUri: URI.from({ scheme: 'copilotcli', path: `/agents/${name}` }),
+		sourceUri: URI.from({ scheme: 'gunnercli', path: `/agents/${name}` }),
 	};
 }
 
@@ -242,7 +242,7 @@ describe('CopilotCLICustomizationProvider', () => {
 			const items = await provider.provideChatSessionCustomizations(undefined!);
 			const agentItems = items.filter((i: vscode.ChatSessionCustomizationItem) => i.type === FakeChatSessionCustomizationType.Agent);
 			expect(agentItems).toHaveLength(1);
-			expect(agentItems[0].uri.scheme).toBe('copilotcli');
+			expect(agentItems[0].uri.scheme).toBe('gunnercli');
 			expect(agentItems[0].uri.path).toBe('/agents/task');
 			expect(agentItems[0].groupKey).toBeUndefined();
 		});

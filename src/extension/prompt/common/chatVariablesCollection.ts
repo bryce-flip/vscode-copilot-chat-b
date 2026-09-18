@@ -134,7 +134,7 @@ export const CustomizationsIndexId = 'vscode.customizations.index';
 /**
  * URI schemes used for chat session references.
  */
-export const SessionReferenceSchemes: ReadonlySet<string> = new Set(['vscode-chat-session', 'copilotcli', 'claude-code']);
+export const SessionReferenceSchemes: ReadonlySet<string> = new Set(['vscode-chat-session', 'gunnercli', 'claude-code']);
 
 /**
  * Check if a URI scheme identifies a chat session reference.

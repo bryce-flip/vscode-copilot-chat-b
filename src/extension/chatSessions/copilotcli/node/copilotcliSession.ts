@@ -303,7 +303,7 @@ export class CopilotCLISession extends DisposableStore implements ICopilotCLISes
 				kind: SpanKind.INTERNAL,
 				attributes: {
 					[GenAiAttr.OPERATION_NAME]: GenAiOperationName.INVOKE_AGENT,
-					[GenAiAttr.AGENT_NAME]: 'copilotcli',
+					[GenAiAttr.AGENT_NAME]: 'gunnercli',
 					[GenAiAttr.PROVIDER_NAME]: 'github',
 					[GenAiAttr.CONVERSATION_ID]: this.sessionId,
 					[CopilotChatAttr.SESSION_ID]: this.sessionId,

@@ -95,7 +95,7 @@ suite.skip('from csv to input rows to pipeline', () => {
 		const configFilePath = path.join(fixtures, 'config.json');
 
 		// await fs.writeFile(configFilePath, JSON.stringify({
-		// 	'github.copilot.chat.advanced.inlineEdits.xtabProvider.modelConfiguration': {
+		// 	'gunner.chat.advanced.inlineEdits.xtabProvider.modelConfiguration': {
 		// 	}
 		// }, null, 2));
 

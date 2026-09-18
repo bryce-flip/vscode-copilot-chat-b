@@ -18,7 +18,7 @@ import { EXTENSION_ID } from '../../common/constants';
 import { getRepoId } from './copilotCodingAgentUtils';
 
 export const GHPR_EXTENSION_ID = 'GitHub.vscode-pull-request-github';
-const PENDING_CHAT_SESSION_STORAGE_KEY = 'github.copilot.pendingChatSession';
+const PENDING_CHAT_SESSION_STORAGE_KEY = 'gunner.pendingChatSession';
 
 export enum UriHandlerPaths {
 	OpenSession = '/openAgentSession',
@@ -76,7 +76,7 @@ export class ChatSessionsUriHandler extends Disposable implements CustomUriHandl
 					});
 					if (type?.startsWith('copilot') && prId) {
 						// For now we hardcode it to this type, eventually the full type should come in the URI
-						return this._openGitHubSession('copilot-cloud-agent', prId, url, branch);
+						return this._openGitHubSession('gunner-cloud-agent', prId, url, branch);
 					}
 				}
 		}
@@ -242,7 +242,7 @@ export class ChatSessionsUriHandler extends Disposable implements CustomUriHandl
 		if (!pullRequest) {
 			return;
 		}
-		const uri = vscode.Uri.from({ scheme: 'copilot-cloud-agent', path: '/' + pullRequest.number.toString() });
+		const uri = vscode.Uri.from({ scheme: 'gunner-cloud-agent', path: '/' + pullRequest.number.toString() });
 		await this._extensionContext.globalState.update(PENDING_CHAT_SESSION_STORAGE_KEY, undefined);
 		await vscode.commands.executeCommand('vscode.open', uri);
 

@@ -8,11 +8,15 @@ import { Disposable } from '../../../util/vs/base/common/lifecycle';
 export class WalkthroughCommandContribution extends Disposable {
 	constructor() {
 		super();
-		this._register(vscode.commands.registerCommand('github.copilot.open.walkthrough', () => {
-			vscode.commands.executeCommand('workbench.action.openWalkthrough', { category: 'GitHub.gunner#copilotWelcome' }, /* toSide */ false);
+		this._register(vscode.commands.registerCommand('gunner.open.walkthrough', () => {
+			vscode.commands.executeCommand('workbench.action.openWalkthrough', { category: 'GitHub.gunner#gunnerWelcome' }, /* toSide */ false);
 		}));
 
-		this._register(vscode.commands.registerCommand('github.copilot.mcp.viewContext7', () => {
+		this._register(vscode.commands.registerCommand('gunner.chat.open', () => {
+			vscode.commands.executeCommand('workbench.action.chat.open', { mode: 'ask' });
+		}));
+
+		this._register(vscode.commands.registerCommand('gunner.mcp.viewContext7', () => {
 			const isInsiders = vscode.env.appName.includes('Insiders');
 			const scheme = isInsiders ? 'vscode-insiders' : 'vscode';
 

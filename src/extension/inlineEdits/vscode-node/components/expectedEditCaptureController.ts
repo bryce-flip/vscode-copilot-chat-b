@@ -16,7 +16,7 @@ import { DebugRecorder } from '../../node/debugRecorder';
 import { filterLogForSensitiveFiles } from './inlineEditDebugComponent';
 import { NesFeedbackSubmitter } from './nesFeedbackSubmitter';
 
-export const copilotNesCaptureMode = 'copilotNesCaptureMode';
+export const gunnerNesCaptureMode = 'gunnerNesCaptureMode';
 
 interface CaptureState {
 	active: boolean;
@@ -126,7 +126,7 @@ export class ExpectedEditCaptureController extends Disposable {
 		};
 
 		// Set context key to enable keybindings
-		await commands.executeCommand('setContext', copilotNesCaptureMode, true);
+		await commands.executeCommand('setContext', gunnerNesCaptureMode, true);
 
 		// Show status bar message
 		this._createStatusBarItem();
@@ -210,7 +210,7 @@ export class ExpectedEditCaptureController extends Disposable {
 	 */
 	private async cleanup(): Promise<void> {
 		this._state = undefined;
-		await commands.executeCommand('setContext', copilotNesCaptureMode, false);
+		await commands.executeCommand('setContext', gunnerNesCaptureMode, false);
 		this._disposeStatusBarItem();
 	}
 
@@ -484,7 +484,7 @@ export class ExpectedEditCaptureController extends Disposable {
 		if (this._state?.active) {
 			this._state = undefined;
 			// Note: Can't await in dispose, but this is best-effort cleanup
-			void commands.executeCommand('setContext', copilotNesCaptureMode, false);
+			void commands.executeCommand('setContext', gunnerNesCaptureMode, false);
 		}
 		this._disposeStatusBarItem();
 		super.dispose();

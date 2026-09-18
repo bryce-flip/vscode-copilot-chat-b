@@ -4,8 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 export enum Icon {
-	Logo = '$(copilot)',
-	Warning = '$(copilot-warning)',
-	NotConnected = '$(copilot-not-connected)',
-	Blocked = '$(copilot-blocked)',
+	Logo = '$(gunner-logo)',
+	Warning = '$(gunner-warning)',
+	NotConnected = '$(gunner-notconnected)',
+	Blocked = '$(gunner-warning)',
 }

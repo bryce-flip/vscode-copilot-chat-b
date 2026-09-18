@@ -236,7 +236,7 @@ function createChatContext(sessionId: string, isUntitled: boolean): vscode.ChatC
 		history: [],
 		yieldRequested: false,
 		chatSessionContext: {
-			chatSessionItem: { resource: vscode.Uri.from({ scheme: 'copilotcli', path: `/${sessionId}` }), label: 'temp' } as vscode.ChatSessionItem,
+			chatSessionItem: { resource: vscode.Uri.from({ scheme: 'gunnercli', path: `/${sessionId}` }), label: 'temp' } as vscode.ChatSessionItem,
 			isUntitled
 		} as vscode.ChatSessionContext,
 	} as vscode.ChatContext;
@@ -780,7 +780,7 @@ describe('CopilotCLIChatSessionParticipant.handleRequest', () => {
 			customSessionTitleService,
 			new (mock<IOctoKitService>())(),
 		);
-		const sessionResource = vscode.Uri.from({ scheme: 'copilotcli', path: `/${sessionId}` });
+		const sessionResource = vscode.Uri.from({ scheme: 'gunnercli', path: `/${sessionId}` });
 		const contentToken = disposables.add(new CancellationTokenSource()).token;
 
 		const sessionContent = await invalidContentProvider.provideChatSessionContentForExistingSession(sessionResource, contentToken);
@@ -1747,17 +1747,17 @@ describe('CopilotCLIChatSessionParticipant.handleRequest', () => {
 		// When delegating from another chat:
 		// 1. handleRequest is called with chatSessionContext=undefined → triggers handleDelegationFromAnotherChat
 		// 2. createCLISessionAndSubmitRequest creates a session, stores prompt in contextForRequest,
-		//    then calls vscode.commands.executeCommand('workbench.action.chat.openSessionWithPrompt.copilotcli', ...)
-		// 3. VS Code core opens the new session and calls handleRequest again with the copilotcli:// resource,
+		//    then calls vscode.commands.executeCommand('workbench.action.chat.openSessionWithPrompt.gunnercli', ...)
+		// 3. VS Code core opens the new session and calls handleRequest again with the gunnercli:// resource,
 		//    but due to a core bug chatSessionContext may be undefined
-		// 4. The workaround detects the copilotcli:// scheme + stored contextForRequest data and
+		// 4. The workaround detects the gunnercli:// scheme + stored contextForRequest data and
 		//    reconstructs a synthetic chatSessionContext, so the session is reused with the stored prompt.
 
 		beforeEach(() => {
 			// Override the default throwing behavior to simulate VS Code core
-			// calling handleRequest again with the copilotcli:// resource but with chatSessionContext lost.
+			// calling handleRequest again with the gunnercli:// resource but with chatSessionContext lost.
 			mockExecuteCommand.mockImplementation(async (command: string, args: any) => {
-				if (command === 'workbench.action.chat.openSessionWithPrompt.copilotcli') {
+				if (command === 'workbench.action.chat.openSessionWithPrompt.gunnercli') {
 					// Simulate VS Code core: it opens the session and fires handleRequest,
 					// but the core bug means chatSessionContext is undefined.
 					const callbackRequest = new TestChatRequest(args.prompt);
@@ -1775,7 +1775,7 @@ describe('CopilotCLIChatSessionParticipant.handleRequest', () => {
 			// This triggers handleDelegationFromAnotherChat → createCLISessionAndSubmitRequest
 			// which creates a session, stores prompt/attachments, calls executeCommand.
 			// The mock executeCommand simulates VS Code calling handleRequest again with
-			// the copilotcli:// resource but chatSessionContext=undefined (the core bug).
+			// the gunnercli:// resource but chatSessionContext=undefined (the core bug).
 			// The workaround reconstructs context and reuses the session.
 			const request = new TestChatRequest('Build feature X');
 			const context = { chatSessionContext: undefined } as vscode.ChatContext;
@@ -1786,9 +1786,9 @@ describe('CopilotCLIChatSessionParticipant.handleRequest', () => {
 
 			// executeCommand should have been called with the correct command and args
 			expect(mockExecuteCommand).toHaveBeenCalledWith(
-				'workbench.action.chat.openSessionWithPrompt.copilotcli',
+				'workbench.action.chat.openSessionWithPrompt.gunnercli',
 				expect.objectContaining({
-					resource: expect.objectContaining({ scheme: 'copilotcli' }),
+					resource: expect.objectContaining({ scheme: 'gunnercli' }),
 					prompt: 'Build feature X',
 				})
 			);
@@ -1809,16 +1809,16 @@ describe('CopilotCLIChatSessionParticipant.handleRequest', () => {
 		});
 
 		it('falls through to new delegation when executeCommand callback has a different session id with no stored context', async () => {
-			// Override the mock ONCE: the first callback uses a DIFFERENT copilotcli:// session id
+			// Override the mock ONCE: the first callback uses a DIFFERENT gunnercli:// session id
 			// that has nothing in contextForRequest. The workaround should NOT activate for that id,
 			// and instead it falls through to a new delegation creating another session.
 			// The second executeCommand call (from that inner delegation) falls back to the
 			// default mock which correctly passes args.resource, activating the workaround.
 			mockExecuteCommand.mockImplementationOnce(async (command: string, args: any) => {
-				if (command === 'workbench.action.chat.openSessionWithPrompt.copilotcli') {
+				if (command === 'workbench.action.chat.openSessionWithPrompt.gunnercli') {
 					const callbackRequest = new TestChatRequest(args.prompt);
 					// Use a different session id than the one created by the delegation
-					callbackRequest.sessionResource = vscode.Uri.from({ scheme: 'copilotcli', path: '/unknown-session-999' }) as any;
+					callbackRequest.sessionResource = vscode.Uri.from({ scheme: 'gunnercli', path: '/unknown-session-999' }) as any;
 					const callbackContext = { chatSessionContext: undefined } as vscode.ChatContext;
 					const callbackStream = new MockChatResponseStream();
 					const callbackToken = disposables.add(new CancellationTokenSource()).token;
@@ -1858,7 +1858,7 @@ describe('CopilotCLIChatSessionParticipant.handleRequest', () => {
 
 			// executeCommand should have been called (delegation creates a session and calls it)
 			expect(mockExecuteCommand).toHaveBeenCalledWith(
-				'workbench.action.chat.openSessionWithPrompt.copilotcli',
+				'workbench.action.chat.openSessionWithPrompt.gunnercli',
 				expect.objectContaining({
 					prompt: 'do some work',
 				})
@@ -2175,7 +2175,7 @@ describe('CopilotCLIChatSessionParticipant.handleRequest', () => {
 			await participant.createHandler()(request, context, stream, token);
 
 			expect(capturedUri).toBeDefined();
-			expect(capturedUri!.scheme).toBe('copilotcli');
+			expect(capturedUri!.scheme).toBe('gunnercli');
 			expect(capturedUri!.path).toBe('/untitled:uri-check');
 		});
 

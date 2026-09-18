@@ -404,7 +404,7 @@ export class FixedCopilotTokenManager extends BaseCopilotTokenManager implements
 
 /**
  * A token manager that never talks to GitHub. Used when the user configured a
- * local OpenAI-compatible model (`github.copilot.chat.localModel.*`).
+ * local OpenAI-compatible model (`gunner.chat.localModel.*`).
  */
 export class LocalOpenAIModelCopilotTokenManager extends BaseCopilotTokenManager implements CheckCopilotToken {
 	constructor(

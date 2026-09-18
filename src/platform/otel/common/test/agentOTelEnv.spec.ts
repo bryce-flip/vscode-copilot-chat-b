@@ -19,7 +19,7 @@ function makeConfig(overrides: Partial<OTelConfig> = {}): OTelConfig {
 		dbSpanExporter: false,
 		logLevel: 'info',
 		httpInstrumentation: false,
-		serviceName: 'copilot-chat',
+		serviceName: 'gunner',
 		serviceVersion: '1.0.0',
 		sessionId: 'test-session',
 		resourceAttributes: {},

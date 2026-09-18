@@ -88,7 +88,7 @@ function createSession(state: SessionInfo['state'] = 'completed'): SessionInfo {
 describe('copilotCloudSessionsProvider helpers', () => {
 	it('coerces object-shaped initialSessionOptions into option entries', () => {
 		const logService = new RecordingLogService();
-		const sessionResource = vscode.Uri.parse('copilot-cloud-agent:/1');
+		const sessionResource = vscode.Uri.parse('gunner-cloud-agent:/1');
 
 		const result = normalizeInitialSessionOptions({
 			models: { id: 'gpt-4.1', name: 'GPT-4.1' },
@@ -127,7 +127,7 @@ describe('copilotCloudSessionsProvider helpers', () => {
 
 describe('ChatSessionContentBuilder', () => {
 	it('ignores malformed tool_calls payloads instead of throwing', async () => {
-		const builder = new ChatSessionContentBuilder('copilot-cloud-agent', new TestGitService());
+		const builder = new ChatSessionContentBuilder('gunner-cloud-agent', new TestGitService());
 		const logs = [
 			'data: {"choices":[{"finish_reason":"stop","delta":{"role":"assistant","content":"Cloud reply","tool_calls":{"id":"not-an-array"}}}],"created":0,"id":"chunk-1","usage":{"completion_tokens":0,"prompt_tokens":0,"prompt_tokens_details":{"cached_tokens":0},"total_tokens":0},"model":"test-model","object":"chat.completion.chunk"}',
 		].join('\n');

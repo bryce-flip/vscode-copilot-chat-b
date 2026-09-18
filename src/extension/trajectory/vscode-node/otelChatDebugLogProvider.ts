@@ -614,7 +614,7 @@ export class OTelChatDebugLogProviderContribution extends Disposable implements 
 		const spans = allEntries.map(entry => entryToExportSpan(entry));
 
 		const otlpExport = wrapInResourceSpans(spans, {
-			'service.name': 'copilot-chat',
+			'service.name': 'gunner',
 			'session.id': sessionId,
 		});
 

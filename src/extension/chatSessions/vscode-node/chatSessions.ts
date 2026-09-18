@@ -87,10 +87,10 @@ export interface CrossChatSessionWithPR {
 	};
 }
 
-const CLOSE_SESSION_PR_CMD = 'github.copilot.cloud.sessions.proxy.closeChatSessionPullRequest';
+const CLOSE_SESSION_PR_CMD = 'gunner.cloud.sessions.proxy.closeChatSessionPullRequest';
 export class ChatSessionsContrib extends Disposable implements IExtensionContribution {
 	readonly id = 'chatSessions';
-	readonly copilotcliSessionType = 'copilotcli';
+	readonly gunnercliSessionType = 'gunnercli';
 
 	private copilotCloudRegistrations: DisposableStore | undefined;
 	private copilotAgentInstaService: IInstantiationService | undefined;
@@ -214,10 +214,10 @@ export class ChatSessionsContrib extends Disposable implements IExtensionContrib
 
 		copilotModels.registerLanguageModelChatProvider(vscode.lm);
 
-		const copilotcliParticipant = vscode.chat.createChatParticipant(this.copilotcliSessionType, copilotcliChatSessionParticipant.createHandler());
-		this._register(vscode.chat.registerChatSessionContentProvider(this.copilotcliSessionType, copilotcliChatSessionContentProvider, copilotcliParticipant));
+		const copilotcliParticipant = vscode.chat.createChatParticipant(this.gunnercliSessionType, copilotcliChatSessionParticipant.createHandler());
+		this._register(vscode.chat.registerChatSessionContentProvider(this.gunnercliSessionType, copilotcliChatSessionContentProvider, copilotcliParticipant));
 		const copilotcliCustomizationProvider = this._register(copilotcliAgentInstaService.createInstance(CopilotCLICustomizationProvider));
-		this._register(vscode.chat.registerChatSessionCustomizationProvider(this.copilotcliSessionType, CopilotCLICustomizationProvider.metadata, copilotcliCustomizationProvider));
+		this._register(vscode.chat.registerChatSessionCustomizationProvider(this.gunnercliSessionType, CopilotCLICustomizationProvider.metadata, copilotcliCustomizationProvider));
 		this._register(registerCLIChatCommands(copilotCLISessionService, copilotCLIWorktreeManagerService, gitService, copilotCLIWorkspaceFolderSessions, copilotcliChatSessionContentProvider, folderRepositoryManager, copilotCLIFolderMruService, nativeEnvService, fileSystemService, sessionTracker, terminalIntegration, logService));
 		// #endregion
 
@@ -253,7 +253,7 @@ export class ChatSessionsContrib extends Disposable implements IExtensionContrib
 			));
 
 		const copilotcliSessionItemProvider = this._register(copilotcliAgentInstaService.createInstance(CopilotCLIChatSessionItemProviderV1));
-		this._register(vscode.chat.registerChatSessionItemProvider(this.copilotcliSessionType, copilotcliSessionItemProvider));
+		this._register(vscode.chat.registerChatSessionItemProvider(this.gunnercliSessionType, copilotcliSessionItemProvider));
 		this._register(copilotcliAgentInstaService.createInstance(ChatSessionRepositoryTracker, copilotcliSessionItemProvider));
 		const copilotcliChatSessionContentProvider = copilotcliAgentInstaService.createInstance(CopilotCLIChatSessionContentProviderV1, copilotcliSessionItemProvider);
 		const promptResolver = copilotcliAgentInstaService.createInstance(CopilotCLIPromptResolver);
@@ -283,10 +283,10 @@ export class ChatSessionsContrib extends Disposable implements IExtensionContrib
 
 		copilotModels.registerLanguageModelChatProvider(vscode.lm);
 
-		const copilotcliParticipant = vscode.chat.createChatParticipant(this.copilotcliSessionType, copilotcliChatSessionParticipant.createHandler());
-		this._register(vscode.chat.registerChatSessionContentProvider(this.copilotcliSessionType, copilotcliChatSessionContentProvider, copilotcliParticipant));
+		const copilotcliParticipant = vscode.chat.createChatParticipant(this.gunnercliSessionType, copilotcliChatSessionParticipant.createHandler());
+		this._register(vscode.chat.registerChatSessionContentProvider(this.gunnercliSessionType, copilotcliChatSessionContentProvider, copilotcliParticipant));
 		const copilotcliCustomizationProvider = this._register(copilotcliAgentInstaService.createInstance(CopilotCLICustomizationProvider));
-		this._register(vscode.chat.registerChatSessionCustomizationProvider(this.copilotcliSessionType, CopilotCLICustomizationProvider.metadata, copilotcliCustomizationProvider));
+		this._register(vscode.chat.registerChatSessionCustomizationProvider(this.gunnercliSessionType, CopilotCLICustomizationProvider.metadata, copilotcliCustomizationProvider));
 		this._register(registerCLIChatCommandsV1(copilotcliSessionItemProvider, copilotCLISessionService, copilotCLIWorktreeManagerService, gitService, gitExtensionService, toolsService, copilotCLIWorkspaceFolderSessions, copilotcliChatSessionContentProvider, folderRepositoryManager, copilotFolderMruService, nativeEnvService, fileSystemService, logService));
 		// #endregion
 
@@ -321,12 +321,12 @@ export class ChatSessionsContrib extends Disposable implements IExtensionContrib
 			)
 		);
 		this.copilotCloudRegistrations.add(
-			vscode.commands.registerCommand('github.copilot.cloud.resetWorkspaceConfirmations', () => {
+			vscode.commands.registerCommand('gunner.cloud.resetWorkspaceConfirmations', () => {
 				cloudSessionsProvider.resetWorkspaceContext();
 			})
 		);
 		this.copilotCloudRegistrations.add(
-			vscode.commands.registerCommand('github.copilot.cloud.sessions.openInBrowser', async (chatSessionItem: vscode.ChatSessionItem) => {
+			vscode.commands.registerCommand('gunner.cloud.sessions.openInBrowser', async (chatSessionItem: vscode.ChatSessionItem) => {
 				cloudSessionsProvider.openSessionInBrowser(chatSessionItem);
 			})
 		);
@@ -348,7 +348,7 @@ export class ChatSessionsContrib extends Disposable implements IExtensionContrib
 			})
 		);
 		this.copilotCloudRegistrations.add(
-			vscode.commands.registerCommand('github.copilot.cloud.sessions.installPRExtension', async () => {
+			vscode.commands.registerCommand('gunner.cloud.sessions.installPRExtension', async () => {
 				await this.installPullRequestExtension();
 			})
 		);

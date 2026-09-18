@@ -18,28 +18,28 @@ import { EXTENSION_ID } from '../../common/constants';
 
 const welcomeViewContextKeys = {
 	Activated: 'github.gunner.activated',
-	Offline: 'github.copilot.offline',
-	IndividualDisabled: 'github.copilot.interactiveSession.individual.disabled',
-	IndividualExpired: 'github.copilot.interactiveSession.individual.expired',
-	ContactSupport: 'github.copilot.interactiveSession.contactSupport',
-	EnterpriseDisabled: 'github.copilot.interactiveSession.enterprise.disabled',
-	InvalidToken: 'github.copilot.interactiveSession.invalidToken',
-	RateLimited: 'github.copilot.interactiveSession.rateLimited',
-	GitHubLoginFailed: 'github.copilot.interactiveSession.gitHubLoginFailed',
+	Offline: 'gunner.offline',
+	IndividualDisabled: 'gunner.interactiveSession.individual.disabled',
+	IndividualExpired: 'gunner.interactiveSession.individual.expired',
+	ContactSupport: 'gunner.interactiveSession.contactSupport',
+	EnterpriseDisabled: 'gunner.interactiveSession.enterprise.disabled',
+	InvalidToken: 'gunner.interactiveSession.invalidToken',
+	RateLimited: 'gunner.interactiveSession.rateLimited',
+	GitHubLoginFailed: 'gunner.interactiveSession.gitHubLoginFailed',
 };
 
-const chatQuotaExceededContextKey = 'github.copilot.chat.quotaExceeded';
+const chatQuotaExceededContextKey = 'gunner.chat.quotaExceeded';
 
-const showLogViewContextKey = `github.copilot.chat.showLogView`;
-const debugReportFeedbackContextKey = 'github.copilot.debugReportFeedback';
+const showLogViewContextKey = `gunner.chat.showLogView`;
+const debugReportFeedbackContextKey = 'gunner.debugReportFeedback';
 
-const previewFeaturesDisabledContextKey = 'github.copilot.previewFeaturesDisabled';
+const previewFeaturesDisabledContextKey = 'gunner.previewFeaturesDisabled';
 
-const debugContextKey = 'github.copilot.chat.debug';
+const debugContextKey = 'gunner.chat.debug';
 
-const missingPermissiveSessionContextKey = 'github.copilot.auth.missingPermissiveSession';
+const missingPermissiveSessionContextKey = 'gunner.auth.missingPermissiveSession';
 
-export const prExtensionInstalledContextKey = 'github.copilot.prExtensionInstalled';
+export const prExtensionInstalledContextKey = 'gunner.prExtensionInstalled';
 
 export class ContextKeysContribution extends Disposable {
 
@@ -60,11 +60,11 @@ export class ContextKeysContribution extends Disposable {
 		void this._inspectContext().catch(console.error);
 		void this._updatePermissiveSessionContext().catch(console.error);
 		this._register(_authenticationService.onDidAuthenticationChange(async () => await this._onAuthenticationChange()));
-		this._register(commands.registerCommand('github.copilot.refreshToken', async () => await this._inspectContext()));
-		this._register(commands.registerCommand('github.copilot.debug.showChatLogView', async () => {
+		this._register(commands.registerCommand('gunner.refreshToken', async () => await this._inspectContext()));
+		this._register(commands.registerCommand('gunner.debug.showChatLogView', async () => {
 			this._showLogView = true;
 			await commands.executeCommand('setContext', showLogViewContextKey, true);
-			await commands.executeCommand('copilot-chat.focus');
+			await commands.executeCommand('gunner.focus');
 		}));
 		this._register({ dispose: () => this._cancelPendingOfflineCheck() });
 		this._register(window.onDidChangeWindowState(() => this._runOfflineCheck('Window state change')));

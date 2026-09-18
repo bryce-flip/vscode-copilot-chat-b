@@ -20,8 +20,8 @@ import { IWorkspaceInfo } from '../common/workspaceInfo';
 import { getCopilotCLISessionDir } from '../copilotcli/node/cliHelpers';
 import { ICopilotCLIAgents } from '../copilotcli/node/copilotCli';
 
-const WORKSPACE_FOLDER_MEMENTO_KEY = 'github.copilot.cli.sessionWorkspaceFolders';
-const WORKTREE_MEMENTO_KEY = 'github.copilot.cli.sessionWorktrees';
+const WORKSPACE_FOLDER_MEMENTO_KEY = 'gunner.cli.sessionWorkspaceFolders';
+const WORKTREE_MEMENTO_KEY = 'gunner.cli.sessionWorktrees';
 const BULK_METADATA_FILENAME = 'copilotcli.session.metadata.json';
 const REQUEST_MAPPING_FILENAME = 'vscode.requests.metadata.json';
 
@@ -42,7 +42,7 @@ export class ChatSessionMetadataStore extends Disposable implements IChatSession
 	) {
 		super();
 
-		this._cacheDirectory = Uri.joinPath(this.extensionContext.globalStorageUri, 'copilotcli');
+		this._cacheDirectory = Uri.joinPath(this.extensionContext.globalStorageUri, 'gunnercli');
 		this._cacheFile = Uri.joinPath(this._cacheDirectory, BULK_METADATA_FILENAME);
 		this._intialize = new Lazy<Promise<void>>(this.initializeStorage.bind(this));
 		this._intialize.value.catch(error => {

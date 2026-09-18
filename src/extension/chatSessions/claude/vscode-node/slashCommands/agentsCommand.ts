@@ -172,7 +172,7 @@ const ALL_TOOLS = [
 export class AgentsSlashCommand implements IClaudeSlashCommandHandler {
 	readonly commandName = 'agents';
 	readonly description = 'Create and manage specialized Claude agents';
-	readonly commandId = 'copilot.claude.agents';
+	readonly commandId = 'gunner.claude.agents';
 
 	constructor(
 		@IWorkspaceService private readonly workspaceService: IWorkspaceService,

@@ -5,7 +5,7 @@
 
 import { Disposable, TextDocumentContentProvider, Uri, workspace } from 'vscode';
 
-export const READONLY_SCHEME = 'copilot-cli-readonly';
+export const READONLY_SCHEME = 'gunner-cli-readonly';
 
 export class ReadonlyContentProvider implements TextDocumentContentProvider {
 	private readonly _contentStore = new Map<string, string>();

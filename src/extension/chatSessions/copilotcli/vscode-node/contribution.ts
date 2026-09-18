@@ -69,8 +69,8 @@ export class CopilotCLIContrib extends Disposable {
 	private async _startMcpServer(logger: ILogger, httpServer: InProcHttpServer, diffState: DiffStateManager, selectionState: SelectionState, contentProvider: ReadonlyContentProvider): Promise<void> {
 		try {
 			const { serverUri, headers } = await httpServer.start({
-				id: 'vscode-copilot-cli',
-				serverLabel: 'VS Code Copilot CLI',
+				id: 'vscode-gunner-cli',
+				serverLabel: 'VS Code Gunner CLI',
 				serverVersion: '0.0.1',
 				registerTools: (server, sessionId) => {
 					registerTools(server, logger, diffState, selectionState, contentProvider, this.sessionTracker, sessionId);

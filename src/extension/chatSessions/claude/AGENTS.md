@@ -368,7 +368,7 @@ To add new functionality:
    - If providing a `commandId`, register the command in `package.json`:
      ```json
      {
-       "command": "copilot.claude.yourCommand",
+       "command": "gunner.claude.yourCommand",
        "title": "Your Command Title",
        "category": "Claude Agent"
      }
@@ -387,7 +387,7 @@ To add new functionality:
 ## Configuration
 
 The integration respects VS Code settings:
-- `github.copilot.advanced.claudeCodeDebugEnabled`: Enables debug logging from Claude Code SDK
+- `gunner.advanced.claudeCodeDebugEnabled`: Enables debug logging from Claude Code SDK
 
 ## Upgrading Anthropic SDK Packages
 

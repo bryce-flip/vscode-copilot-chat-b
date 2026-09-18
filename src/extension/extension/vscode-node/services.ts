@@ -192,9 +192,9 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 		builder.define(ICopilotTokenManager, getOrCreateTestingCopilotTokenManager(env.devDeviceId));
 	} else {
 		setupTelemetry(builder, extensionContext, internalAIKey, internalLargeEventAIKey, ariaKey);
-		const localModelEnabled = workspace.getConfiguration('github.copilot').get<boolean>(ConfigKey.LocalModelEnabled.id) === true;
-		const localModelApiKey = (workspace.getConfiguration('github.copilot').get<string>(ConfigKey.LocalModelApiKey.id) ?? '').trim();
-		const localModelBaseUrl = (workspace.getConfiguration('github.copilot').get<string>(ConfigKey.LocalModelBaseUrl.id) ?? '').trim();
+		const localModelEnabled = workspace.getConfiguration('gunner').get<boolean>(ConfigKey.LocalModelEnabled.id) === true;
+		const localModelApiKey = (workspace.getConfiguration('gunner').get<string>(ConfigKey.LocalModelApiKey.id) ?? '').trim();
+		const localModelBaseUrl = (workspace.getConfiguration('gunner').get<string>(ConfigKey.LocalModelBaseUrl.id) ?? '').trim();
 		if (localModelEnabled && localModelApiKey && localModelBaseUrl) {
 			builder.define(ICopilotTokenManager, new SyncDescriptor(LocalOpenAIModelCopilotTokenManager));
 		} else {
@@ -281,7 +281,7 @@ export function registerServices(builder: IInstantiationServiceBuilder, extensio
 	builder.define(IOTelSqliteStore, otelSqliteStore);
 
 	// OTel service — resolve config from env + settings, create appropriate impl
-	const otelSettings = workspace.getConfiguration('github.copilot.chat.otel');
+	const otelSettings = workspace.getConfiguration('gunner.chat.otel');
 	const otelConfig = resolveOTelConfig({
 		env: process.env,
 		settingEnabled: otelSettings.get<boolean>('enabled'),

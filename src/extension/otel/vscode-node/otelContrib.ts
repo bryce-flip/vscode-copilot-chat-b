@@ -34,7 +34,7 @@ export class OTelContrib extends Disposable implements IExtensionContribution {
 
 		this._fireActivatedTelemetry();
 
-		this._register(vscode.commands.registerCommand('github.copilot.chat.otel.flush', async () => {
+		this._register(vscode.commands.registerCommand('gunner.chat.otel.flush', async () => {
 			if (!this._otelService.config.enabled) {
 				return;
 			}
@@ -46,7 +46,7 @@ export class OTelContrib extends Disposable implements IExtensionContribution {
 		// Export the agent-traces.db file.
 		// Programmatic (eval harness): called with savePath URI or string → copies DB there.
 		// Interactive (command palette): shows save dialog with default filename.
-		this._register(vscode.commands.registerCommand('github.copilot.chat.otel.exportAgentTracesDB', async (savePath?: vscode.Uri | string) => {
+		this._register(vscode.commands.registerCommand('gunner.chat.otel.exportAgentTracesDB', async (savePath?: vscode.Uri | string) => {
 			const dbPath = this._sqliteStore.dbPath;
 			if (!dbPath) {
 				return;
@@ -132,7 +132,7 @@ export class OTelContrib extends Disposable implements IExtensionContribution {
 			captureContent: String(config.captureContent),
 			protocol: config.otlpProtocol,
 			hasCustomEndpoint: String(config.enabled && config.otlpEndpoint !== DEFAULT_OTLP_ENDPOINT && config.otlpEndpoint !== DEFAULT_OTLP_ENDPOINT + '/'),
-			hasCustomServiceName: String(config.serviceName !== 'copilot-chat'),
+			hasCustomServiceName: String(config.serviceName !== 'gunner'),
 			hasResourceAttributes: String(Object.keys(config.resourceAttributes).length > 0),
 		});
 	}
